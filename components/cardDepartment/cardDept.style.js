@@ -16,21 +16,15 @@ const styles = StyleSheet.create({
         borderRadius: 15,
     },
     overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "#7066e5",
-        opacity: 1,
-        borderRadius: 8,
-        marginTop: 147,
-        marginLeft: 165,
-        width: 100,
-        height: 40
-    },
-    price: {
         position: "absolute",
-        top: 16,
-        left: 16,
-        marginTop: 140,
-        marginLeft: 160,
+        bottom: 10,
+        right: 10,
+        backgroundColor: "#7066e5",
+        borderRadius: 7,
+        padding: 8,
+    },
+
+    price: {
         color: "white",
         fontSize: 16,
         fontWeight: "bold",
