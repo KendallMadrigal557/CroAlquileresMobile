@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import NavBar from "../components/navbar/navbar";
-import DepartmentCard from "../components/cardDepartment/carddepartment";
+import DepartmentCard from "../components/Department/cardDepartment/carddepartment";
+import DepartmentSearch from "../components/Department/DepartmentSeacrh/departmentSearch"
 export default function Page() {
   return (
     <View style={styles.container}>
@@ -10,6 +11,7 @@ export default function Page() {
 
       <ScrollView showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContainer} >
+        <DepartmentSearch/>
         <DepartmentCard
           image={require("../assets/minimal-apartment.jpg")}
           price="$250,000"
@@ -83,9 +85,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 80, // Ajusta el valor según el tamaño del navbar
-  },
-  cardContainer: {
-    marginBottom: 80, // Ajusta el valor según el tamaño del navbar
+    paddingBottom: 80, 
   },
 });
