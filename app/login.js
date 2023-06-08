@@ -3,10 +3,14 @@ import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from '
 import { Entypo } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import NavBar from '../components/navbar/navbar';
+import { useNavigation } from '@react-navigation/native';
 
 const LoginPage = () => {
     const router = useRouter();
-
+    const navigation = useNavigation();
+    const goToRegister = () => {
+        navigation.navigate('register'); 
+    };
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -33,7 +37,7 @@ const LoginPage = () => {
                     <Text style={styles.inputLabel}>Contraseña</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder='Password'
+                        placeholder='Contraseña'
                         placeholderTextColor="#AAAAAA"
                     />
                 </View>
@@ -45,7 +49,9 @@ const LoginPage = () => {
                 </View>
                 <View style={styles.registerContainer}>
                     <Text style={styles.registerText}>No tienes cuenta?</Text>
-                    <Text style={styles.registerButtonText}>Registrarse</Text>
+                    <TouchableOpacity onPress={goToRegister}>
+                        <Text style={styles.registerButtonText}>Registrarse</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
             <NavBar />
