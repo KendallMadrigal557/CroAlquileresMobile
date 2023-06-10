@@ -64,20 +64,20 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#101010',
         padding: 24,
-        paddingTop: 40, // Ajuste el paddingTop para evitar la línea blanca en la parte superior
+        paddingTop: 40,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     content: {
-        marginTop: 50, // Mueva el formulario hacia abajo ajustando el marginTop según sea necesario
+        marginTop: 50, 
         alignItems: 'center',
     },
     titleContainer: {
         flex: 1,
         marginTop: 20,
-        marginLeft: 80, // Ajuste el marginLeft para mover el título hacia la derecha
+        marginLeft: 80, 
         marginBottom: 10,
     },
     title: {
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
-        zIndex: 1, // Añadí zIndex para asegurar que el botón de retroceso esté por encima del resto del contenido
+        zIndex: 1, 
         backgroundColor: '#2f3030',
         padding: 10,
         borderRadius: 5,
