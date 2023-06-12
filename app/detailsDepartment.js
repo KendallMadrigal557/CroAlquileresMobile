@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Image, Text, Pressable } from "react-native";
+import { StyleSheet, View, Image, Text, Pressable, ScrollView } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import NavBar from '../components/navbar/navbar';
 import { useNavigation } from "@react-navigation/native";
@@ -16,14 +16,22 @@ const DetailsPage = ({
         navigation.goBack();
     };
 
+    const handleFavoritePress = () => {
+
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Pressable onPress={goBack} style={styles.back}>
                     <Entypo name="chevron-left" size={24} color="white" />
                 </Pressable>
+                <Pressable onPress={handleFavoritePress} style={styles.favoriteButton}>
+                    <MaterialIcons name="favorite-border" size={24} color="white" />
+                </Pressable>
             </View>
-            <View style={styles.content}>
+            <ScrollView showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.content}>
                 <View style={styles.priceContainer}>
                     <Image source={image} style={styles.image} />
                     <View style={styles.overlay}>
@@ -59,10 +67,10 @@ const DetailsPage = ({
                 </Pressable>
                 <View style={styles.priceButtonContainer}>
                     <Pressable style={styles.priceButton}>
-                        <Text style={styles.priceButtonText}>Comprar ahora</Text>
+                        <Text style={styles.priceButtonText}>Reservar ahora</Text>
                     </Pressable>
                 </View>
-            </View>
+            </ScrollView>
             <NavBar />
         </View>
     );
@@ -78,10 +86,12 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 16,
+        justifyContent: "space-between",
+        marginBottom: 6,
     },
     content: {
-        flex: 1,
+        flexGrow: 1,
+        paddingBottom: 80, 
     },
     priceContainer: {
         flexDirection: "row",
@@ -91,7 +101,7 @@ const styles = StyleSheet.create({
     image: {
         width: "100%",
         height: 250,
-        marginTop:70,
+        marginTop: 30,
         borderRadius: 15,
     },
     overlay: {
@@ -134,6 +144,9 @@ const styles = StyleSheet.create({
     description: {
         color: "white",
     },
+    favoriteButton: {
+        paddingTop: 10,
+    },
     reviewsButton: {
         backgroundColor: "#202020",
         borderRadius: 20,
@@ -162,10 +175,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     back: {
-        position: "absolute",
-        top: 10,
-        left: 10,
-        zIndex: 1,
         backgroundColor: "#2f3030",
         padding: 10,
         borderRadius: 5,
