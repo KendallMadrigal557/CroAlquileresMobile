@@ -14,7 +14,7 @@ const NavBar = () => {
     return (
         <View style={styles.navBar}>
             <FontAwesome name="home" size={24} color="white" onPress={() => handleIconPress('index')} />
-            <Fontisto name="favorite" size={24} color="white" onPress={() => handleIconPress('detailsDepartment')} />
+            <Fontisto name="favorite" size={24} color="white" onPress={() => handleIconPress('review')} />
             <MaterialCommunityIcons name="account-question" size={24} color="white" onPress={() => handleIconPress('faq')} />
             <FontAwesome name="user" size={24} color="white" onPress={() => handleIconPress('login')} />
         </View>
