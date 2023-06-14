@@ -1,0 +1,52 @@
+import axios from 'axios';
+
+const API_URL = 'http://tu-servidor.com/api'; // Reemplaza con la URL de tu servidor
+
+class FAQService {
+    static async createFAQ(faqData) {
+        try {
+            const response = await axios.post(`${API_URL}/faqs`, faqData);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async getFAQs() {
+        try {
+            const response = await axios.get(`${API_URL}/faqs`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async getFAQById(id) {
+        try {
+            const response = await axios.get(`${API_URL}/faqs/${id}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async updateFAQ(id, faqData) {
+        try {
+            const response = await axios.put(`${API_URL}/faqs/${id}`, faqData);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async deleteFAQ(id) {
+        try {
+            const response = await axios.delete(`${API_URL}/faqs/${id}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+}
+
+export default FAQService;
