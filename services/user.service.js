@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://tu-servidor.com/api'; 
+import API_URL from '../config/config';
 
 class UserService {
     static async createUser(userData) {

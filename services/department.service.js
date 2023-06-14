@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:3001/api';
+import API_URL from '../config/config';
 
 class DepartmentService {
     static async createDepartment(departmentData) {

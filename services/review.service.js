@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://tu-servidor.com/api'; // Reemplaza con la URL de tu servidor
+import API_URL from '../config/config';
 
 class ReviewService {
     static async createReview(reviewData) {
