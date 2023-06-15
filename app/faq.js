@@ -1,45 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from '../components/navbar/navbar';
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import FAQService from "../services/faq.service";
 
 const FAQPage = () => {
-    const faqData = [
-        {
-            question: "¿Cuál es la política de devoluciones?",
-            answer:
-                "Nuestra política de devoluciones permite devolver los productos dentro de los 30 días siguientes a la compra.",
-        },
-        {
-            question: "¿Cuáles son los métodos de pago aceptados?",
-            answer:
-                "Aceptamos tarjetas de crédito Visa, Mastercard y American Express, así como PayPal.",
-        },
-        {
-            question: "¿Cuál es la política de devoluciones?",
-            answer:
-                "Nuestra política de devoluciones permite devolver los productos dentro de los 30 días siguientes a la compra.",
-        },
-        {
-            question: "¿Cuáles son los métodos de pago aceptados?",
-            answer:
-                "Aceptamos tarjetas de crédito Visa, Mastercard y American Express, así como PayPal.",
-        },
-        {
-            question: "¿Cuál es la política de devoluciones?",
-            answer:
-                "Nuestra política de devoluciones permite devolver los productos dentro de los 30 días siguientes a la compra.",
-        },
-        {
-            question: "¿Cuáles son los métodos de pago aceptados?",
-            answer:
-                "Aceptamos tarjetas de crédito Visa, Mastercard y American Express, así como PayPal.",
-        },
-    ];
+    const [faqData, setFaqData] = useState([]);
+
+    useEffect(() => {
+        const fetchFAQs = async () => {
+            try {
+                const faqs = await FAQService.getFAQs();
+                setFaqData(faqs);
+            } catch (error) {
+                console.error("Error al obtener las preguntas frecuentes:", error);
+            }
+        };
+
+        fetchFAQs();
+    }, []);
 
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollViewContainer}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollViewContainer}
+            >
                 <Text style={styles.title}>Preguntas frecuentes</Text>
                 {faqData.map((item, index) => (
                     <View key={index} style={styles.faqItem}>
@@ -51,7 +36,6 @@ const FAQPage = () => {
             <NavBar />
         </View>
     );
-
 };
 
 const styles = StyleSheet.create({
@@ -91,10 +75,9 @@ const styles = StyleSheet.create({
     },
     scrollViewContainer: {
         flexGrow: 1,
-        paddingTop: 40, 
-        paddingBottom: 80, 
+        paddingTop: 40,
+        paddingBottom: 80,
     },
-
 });
 
 export default FAQPage;

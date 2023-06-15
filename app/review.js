@@ -40,7 +40,7 @@ const ReviewPage = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#202020",
+        backgroundColor: "#222222",
         paddingVertical: 24,
         paddingHorizontal: 16,
     },

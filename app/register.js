@@ -1,23 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import NavBar from '../components/navbar/navbar';
 import { useNavigation } from '@react-navigation/native';
+import NavBar from '../components/navbar/navbar';
+import UserService from '../services/user.service';
 
 const RegisterPage = () => {
-    const router = useRouter();
     const navigation = useNavigation();
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+    });
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleChangeText = (key, value) => {
+        setUserData(prevState => ({ ...prevState, [key]: value }));
+    };
+
     const goToLogin = () => {
         navigation.navigate('login');
     };
+
+    const handleRegister = async () => {
+        try {
+            const { confirmPassword, ...userDataWithoutConfirm } = userData;
+            const response = await UserService.createUser(userDataWithoutConfirm);
+            console.log('User registered:', response);
+            // Aquí puedes redirigir al usuario a la página de inicio de sesión o realizar otras acciones
+        } catch (error) {
+            console.log('Error registering user:', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                setErrorMessage(error.response.data.message);
+            } else {
+                setErrorMessage('Error al registrar el usuario.');
+            }
+        }
+    };
+
     return (
         <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}
-                        showsVerticalScrollIndicator={false}
+            <ScrollView
+                contentContainerStyle={styles.scrollContainer}
+                showsVerticalScrollIndicator={false}
             >
                 <View style={styles.header}>
-                    <Pressable onPress={() => router.back()} style={styles.back}>
+                    <Pressable onPress={goToLogin} style={styles.back}>
                         <Entypo name="chevron-left" size={24} color="white" />
                     </Pressable>
                     <View style={styles.titleContainer}>
@@ -34,6 +63,7 @@ const RegisterPage = () => {
                             style={styles.input}
                             placeholder='Nombre'
                             placeholderTextColor="#AAAAAA"
+                            onChangeText={text => handleChangeText('name', text)}
                         />
                     </View>
                     <View style={styles.inputContainer}>
@@ -42,6 +72,7 @@ const RegisterPage = () => {
                             style={styles.input}
                             placeholder='correo@example.com'
                             placeholderTextColor="#AAAAAA"
+                            onChangeText={text => handleChangeText('email', text)}
                         />
                     </View>
                     <View style={styles.inputContainer}>
@@ -50,6 +81,8 @@ const RegisterPage = () => {
                             style={styles.input}
                             placeholder='Contraseña'
                             placeholderTextColor="#AAAAAA"
+                            onChangeText={text => handleChangeText('password', text)}
+                            secureTextEntry
                         />
                     </View>
                     <View style={styles.inputContainer}>
@@ -58,9 +91,11 @@ const RegisterPage = () => {
                             style={styles.input}
                             placeholder='Confirmar contraseña'
                             placeholderTextColor="#AAAAAA"
+                            onChangeText={text => handleChangeText('confirmPassword', text)}
+                            secureTextEntry
                         />
                     </View>
-                    <TouchableOpacity style={styles.registerButton}>
+                    <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
                         <Text style={styles.registerButtonText}>Registrarse</Text>
                     </TouchableOpacity>
                     <View style={styles.orContainer}>
@@ -74,6 +109,11 @@ const RegisterPage = () => {
                     </View>
                 </View>
             </ScrollView>
+            {errorMessage ? (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{errorMessage}</Text>
+                </View>
+            ) : null}
             <NavBar />
         </View>
     );
@@ -82,7 +122,7 @@ const RegisterPage = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#101010',
+        backgroundColor: '#222222',
         padding: 24,
         paddingTop: 40,
     },
@@ -176,6 +216,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#2f3030',
         padding: 10,
         borderRadius: 5,
+    },
+    errorContainer: {
+        backgroundColor: 'red',
+        padding: 10,
+        alignItems: 'center',
+    },
+    errorText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 

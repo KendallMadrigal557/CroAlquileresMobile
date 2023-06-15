@@ -4,7 +4,7 @@ import API_URL from '../config/config';
 class ReviewService {
     static async createReview(reviewData) {
         try {
-            const response = await axios.post(`${API_URL}/reviews`, reviewData);
+            const response = await axios.post(`${API_URL}/review`, reviewData);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
@@ -13,7 +13,7 @@ class ReviewService {
 
     static async getReviews() {
         try {
-            const response = await axios.get(`${API_URL}/reviews`);
+            const response = await axios.get(`${API_URL}/review`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);

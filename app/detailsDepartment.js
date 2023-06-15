@@ -79,7 +79,7 @@ const DetailsPage = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#101010",
+        backgroundColor: "#222222",
         padding: 24,
         paddingTop: 60,
     },

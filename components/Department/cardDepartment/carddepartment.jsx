@@ -7,7 +7,7 @@ const DepartmentCard = ({ image, price, name, location }) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imageContainer}>
-                <Image source={image} style={styles.image} />
+                <Image source={{ uri: image }} style={styles.image} />
                 <View style={styles.overlay}>
                     <Text style={styles.price}>{price}</Text>
                 </View>
@@ -24,3 +24,4 @@ const DepartmentCard = ({ image, price, name, location }) => {
 };
 
 export default DepartmentCard;
+
