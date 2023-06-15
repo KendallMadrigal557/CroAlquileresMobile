@@ -22,7 +22,7 @@ class ReviewService {
 
     static async getReviewById(id) {
         try {
-            const response = await axios.get(`${API_URL}/reviews/${id}`);
+            const response = await axios.get(`${API_URL}/review/${id}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
@@ -31,7 +31,7 @@ class ReviewService {
 
     static async updateReview(id, reviewData) {
         try {
-            const response = await axios.put(`${API_URL}/reviews/${id}`, reviewData);
+            const response = await axios.put(`${API_URL}/review/${id}`, reviewData);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
@@ -40,7 +40,15 @@ class ReviewService {
 
     static async deleteReview(id) {
         try {
-            const response = await axios.delete(`${API_URL}/reviews/${id}`);
+            const response = await axios.delete(`${API_URL}/review/${id}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+    static async getReviewsByDepartment(departmentId) {
+        try {
+            const response = await axios.get(`${API_URL}/review?departmentId=${departmentId}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);

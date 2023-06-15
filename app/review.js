@@ -1,30 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from "../components/navbar/navbar";
+import { useRoute } from '@react-navigation/native';
+import ReviewService from "../services/review.service";
+
 const ReviewPage = () => {
     const [reviewInput, setReviewInput] = useState("");
-    const [reviews, setReviews] = useState([
-        {
-            review: "Excelente departamento. Muy espacioso y bien ubicado.",
-            date: "12/08/2022",
-        },
-        {
-            review: "Me encantó este departamento. Tiene una vista increíble.",
-            date: "5/04/2023",
-        },
-        {
-            review: "El departamento es muy cómodo y moderno. Lo recomiendo.",
-            date: "21/05/2023",
-        },
-    ]);
+    const [reviews, setReviews] = useState([]);
+    const [userId, setUserId] = useState('');
+    const [loggedIn, setLoggedIn] = useState(false);
+    const route = useRoute();
+    const { departmentId } = route.params;
 
-    const handleReviewSubmit = () => {
-        const newReview = {
-            review: reviewInput,
-            date: new Date().toLocaleDateString(),
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            const user = await AsyncStorage.getItem('user');
+
+            if (user) {
+                const { _id } = JSON.parse(user);
+                setUserId(_id);
+                setLoggedIn(true);
+            }
         };
-        setReviews([...reviews, newReview]);
-        setReviewInput("");
+
+        checkLoginStatus();
+    }, []);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const reviews = await ReviewService.getReviewsByDepartment(departmentId);
+                setReviews(reviews);
+            } catch (error) {
+                console.log('Error fetching reviews:', error);
+            }
+        };
+    
+        fetchReviews();
+    }, [departmentId]);
+
+    const handleReviewSubmit = async () => {
+        const newReview = {
+            idUser: userId,
+            idDepartment: departmentId,
+            review: reviewInput,
+            date: new Date().toLocaleDateString()
+        };
+
+        try {
+            const createdReview = await ReviewService.createReview(newReview);
+            setReviews([...reviews, createdReview]);
+            setReviewInput("");
+        } catch (error) {
+            console.log('Error creating review:', error);
+        }
     };
 
     return (
@@ -40,20 +70,22 @@ const ReviewPage = () => {
                         <Text style={styles.date}>{item.date}</Text>
                     </View>
                 ))}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Escribe una reseña..."
-                        placeholderTextColor="white"
-                        value={reviewInput}
-                        onChangeText={text => setReviewInput(text)}
-                    />
-                    <TouchableOpacity style={styles.button} onPress={handleReviewSubmit}>
-                        <Text style={styles.buttonText}>Enviar</Text>
-                    </TouchableOpacity>
-                </View>
+                {loggedIn && (
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Escribe una reseña..."
+                            placeholderTextColor="white"
+                            value={reviewInput}
+                            onChangeText={text => setReviewInput(text)}
+                        />
+                        <TouchableOpacity style={styles.button} onPress={handleReviewSubmit}>
+                            <Text style={styles.buttonText}>Enviar</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </ScrollView>
-            <NavBar/>
+            <NavBar />
         </View>
     );
 };

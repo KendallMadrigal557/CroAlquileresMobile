@@ -28,10 +28,14 @@ const DetailsPage = () => {
         navigation.goBack();
     };
 
+    const handleReviewsPress = () => {
+        navigation.navigate('review', { departmentId: department._id });
+    };
+
     const handleFavoritePress = () => { };
 
     if (!department) {
-        return null; // Mostrar una pantalla de carga o un indicador mientras se carga el departamento
+        return null;
     }
 
     return (
@@ -63,7 +67,7 @@ const DetailsPage = () => {
                 <View style={styles.cardContainer}>
                     <Text style={styles.description}>{department.description}</Text>
                 </View>
-                <Pressable style={styles.reviewsButton}>
+                <Pressable style={styles.reviewsButton} onPress={handleReviewsPress}>
                     <Text style={styles.reviewsButtonText}>Reseñas</Text>
                 </Pressable>
                 <View style={styles.priceButtonContainer}>
