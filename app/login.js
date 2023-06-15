@@ -1,16 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import NavBar from '../components/navbar/navbar';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import UserService from '../services/user.service';
+import NavBar from '../components/navbar/navbar';
 
 const LoginPage = () => {
-    const router = useRouter();
     const navigation = useNavigation();
-    const goToRegister = () => {
-        navigation.navigate('register'); 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loggedIn, setLoggedIn] = useState(false); // Estado para controlar si el usuario ha iniciado sesión
+    const [userId, setUserId] = useState(''); // Estado para guardar el _id del usuario
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            const user = await AsyncStorage.getItem('user');
+
+            if (user) {
+                const { _id } = JSON.parse(user);
+                setUserId(_id);
+                setLoggedIn(true);
+            }
+        };
+
+        checkLoginStatus();
+    }, []);
+
+    const handleLogin = async () => {
+        try {
+            const users = await UserService.getUsers();
+
+            const authenticatedUser = users.find(user => user.email === email && user.password === password);
+
+            if (authenticatedUser) {
+                await AsyncStorage.setItem('user', JSON.stringify(authenticatedUser));
+                setLoggedIn(true);
+                setUserId(authenticatedUser._id);
+            } else {
+                console.log('Credenciales inválidas');
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
     };
+
+    const handleLogout = async () => {
+        await AsyncStorage.removeItem('user');
+        setLoggedIn(false);
+        setUserId('');
+    };
+
+    const goToRegister = () => {
+        navigation.navigate('register');
+    };
+
+    if (loggedIn) {
+        return (
+            <View style={styles.container}>
+                <View style={styles.centerContainer}>
+                    <Text style={styles.loggedInText}>¡Inicio de sesión exitoso!</Text>
+                    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                        <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+                    </TouchableOpacity>
+                </View>
+                <NavBar />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -31,6 +89,8 @@ const LoginPage = () => {
                         style={styles.input}
                         placeholder='correo@example.com'
                         placeholderTextColor="#AAAAAA"
+                        value={email}
+                        onChangeText={setEmail}
                     />
                 </View>
                 <View style={styles.inputContainer}>
@@ -39,9 +99,12 @@ const LoginPage = () => {
                         style={styles.input}
                         placeholder='Contraseña'
                         placeholderTextColor="#AAAAAA"
+                        secureTextEntry
+                        value={password}
+                        onChangeText={setPassword}
                     />
                 </View>
-                <TouchableOpacity style={styles.loginButton}>
+                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                     <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
                 </TouchableOpacity>
                 <View style={styles.orContainer}>
@@ -66,18 +129,23 @@ const styles = StyleSheet.create({
         padding: 24,
         paddingTop: 40,
     },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     content: {
-        marginTop: 50, 
+        marginTop: 50,
         alignItems: 'center',
     },
     titleContainer: {
         flex: 1,
         marginTop: 20,
-        marginLeft: 80, 
+        marginLeft: 80,
         marginBottom: 10,
     },
     title: {
@@ -148,10 +216,28 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
-        zIndex: 1, 
+        zIndex: 1,
         backgroundColor: '#2f3030',
         padding: 10,
         borderRadius: 5,
+    },
+    loggedInText: {
+        color: '#FFFFFF',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 16,
+    },
+    logoutButton: {
+        backgroundColor: '#491ea2',
+        borderRadius: 50,
+        padding: 12,
+        alignItems: 'center',
+        width: '50%',
+    },
+    logoutButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
