@@ -10,8 +10,8 @@ const LoginPage = () => {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loggedIn, setLoggedIn] = useState(false); // Estado para controlar si el usuario ha iniciado sesión
-    const [userId, setUserId] = useState(''); // Estado para guardar el _id del usuario
+    const [loggedIn, setLoggedIn] = useState(false); 
+    const [userId, setUserId] = useState(''); 
 
     useEffect(() => {
         const checkLoginStatus = async () => {
