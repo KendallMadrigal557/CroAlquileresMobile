@@ -1,24 +1,38 @@
-import React from "react";
-import { StyleSheet, View, Image, Text, Pressable, ScrollView } from "react-native";
-import { Entypo, MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Image, Text, Pressable, ScrollView } from 'react-native';
+import { Entypo, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import NavBar from '../components/navbar/navbar';
-import { useNavigation } from "@react-navigation/native";
+import DepartmentService from '../services/department.service';
 
-const DetailsPage = ({
-    image = require("../assets/minimal-apartment.jpg"),
-    price = 2333,
-    name = "Ejemplo",
-    location = "Ejemplo",
-}) => {
+const DetailsPage = () => {
     const navigation = useNavigation();
+    const route = useRoute();
+    const { departmentId } = route.params;
+    const [department, setDepartment] = useState(null);
+
+    useEffect(() => {
+        const fetchDepartment = async () => {
+            try {
+                const department = await DepartmentService.getDepartmentById(departmentId);
+                setDepartment(department);
+            } catch (error) {
+                console.log('Error fetching department:', error);
+            }
+        };
+
+        fetchDepartment();
+    }, [departmentId]);
 
     const goBack = () => {
         navigation.goBack();
     };
 
-    const handleFavoritePress = () => {
+    const handleFavoritePress = () => { };
 
-    };
+    if (!department) {
+        return null; // Mostrar una pantalla de carga o un indicador mientras se carga el departamento
+    }
 
     return (
         <View style={styles.container}>
@@ -30,37 +44,24 @@ const DetailsPage = ({
                     <MaterialIcons name="favorite-border" size={24} color="white" />
                 </Pressable>
             </View>
-            <ScrollView showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.content}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
                 <View style={styles.priceContainer}>
-                    <Image source={image} style={styles.image} />
+                    <Image source={{ uri: `http://192.168.0.2:3002/uploads/${department.image}` }} style={styles.image} />
                     <View style={styles.overlay}>
-                        <Text style={styles.price}>{price}</Text>
+                        <Text style={styles.price}>{department.price}</Text>
                     </View>
                 </View>
                 <View style={styles.detailsContainer}>
-                    <Text style={styles.name}>{name}</Text>
+                    <Text style={styles.name}>{department.place}</Text>
                     <View style={styles.locationContainer}>
                         <View style={styles.iconContainer}>
-                            <MaterialIcons
-                                name="location-on"
-                                size={16}
-                                color="white"
-                                style={styles.icon}
-                            />
+                            <MaterialIcons name="location-on" size={16} color="white" style={styles.icon} />
                         </View>
-                        <Text style={styles.location}>{location}</Text>
+                        <Text style={styles.location}>{department.location}</Text>
                     </View>
                 </View>
                 <View style={styles.cardContainer}>
-                    <Text style={styles.description}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-                        tempus lectus ut rhoncus semper. Vestibulum tincidunt est at mauris
-                        efficitur, sed aliquam lacus dapibus. Sed sed ipsum quis justo
-                        fermentum feugiat. Suspendisse potenti. Nulla cursus leo risus, eu
-                        dictum nibh pellentesque non. Aenean volutpat vestibulum purus ac
-                        blandit.
-                    </Text>
+                    <Text style={styles.description}>{department.description}</Text>
                 </View>
                 <Pressable style={styles.reviewsButton}>
                     <Text style={styles.reviewsButtonText}>Reseñas</Text>
@@ -75,11 +76,10 @@ const DetailsPage = ({
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#222222",
+        backgroundColor: "#000000",
         padding: 24,
         paddingTop: 60,
     },
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     },
     content: {
         flexGrow: 1,
-        paddingBottom: 80, 
+        paddingBottom: 80,
     },
     priceContainer: {
         flexDirection: "row",

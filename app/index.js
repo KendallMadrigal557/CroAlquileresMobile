@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import NavBar from '../components/navbar/navbar';
-import DepartmentCard from '../components/Department/cardDepartment/carddepartment';
 import DepartmentSearch from '../components/Department/DepartmentSeacrh/departmentSearch';
 import DepartmentService from '../services/department.service';
+import DepartmentCard from '../components/Department/cardDepartment/carddepartment';
 
 export default function Page() {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -24,6 +26,10 @@ export default function Page() {
     fetchDepartments();
   }, []);
 
+  const handleDepartmentCardPress = (department) => {
+    navigation.navigate('detailsDepartment', { departmentId: department._id });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}></View>
@@ -36,13 +42,23 @@ export default function Page() {
           <Text style={styles.noDepartmentsText}>No se encontraron departamentos.</Text>
         ) : (
           departments.map((department) => (
-            <DepartmentCard
+            <Pressable
               key={department._id}
-              image={`http:/192.168.0.2:3002/uploads/${department.image}`}
-              price={department.price}
-              name={department.place}
-              location={department.location}
-            />
+              onPress={() => handleDepartmentCardPress(department)}
+              style={({ pressed }) => [
+                styles.departmentCard,
+                {
+                  opacity: pressed ? 0.5 : 1,
+                },
+              ]}
+            >
+              <DepartmentCard
+                image={`http:/192.168.0.2:3002/uploads/${department.image}`}
+                price={department.price}
+                name={department.place}
+                location={department.location}
+              />
+            </Pressable>
           ))
         )}
       </ScrollView>
@@ -51,7 +67,6 @@ export default function Page() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
