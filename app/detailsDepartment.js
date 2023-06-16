@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Image, Text, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, Text, Pressable, ScrollView, Alert } from 'react-native';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,6 +13,8 @@ const DetailsPage = () => {
     const { departmentId } = route.params;
     const [department, setDepartment] = useState(null);
     const [favoriteStatus, setFavoriteStatus] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [isAvailable, setIsAvailable] = useState(true);
 
     useEffect(() => {
         const fetchDepartment = async () => {
@@ -55,7 +57,7 @@ const DetailsPage = () => {
             const user = await AsyncStorage.getItem('user');
 
             if (!user) {
-                console.log('Usuario no autenticado');
+                Alert.alert('Usuario no autenticado');
                 return;
             }
 
@@ -72,14 +74,24 @@ const DetailsPage = () => {
             if (isFavorite) {
                 const favorite = favorites.find((favorite) => favorite.idDepartment === departmentId);
                 await FavoriteService.deleteFavorite(favorite._id);
-                console.log('Departamento eliminado de favoritos');
+                Alert.alert('Departamento eliminado de favoritos');
             } else {
                 await FavoriteService.createFavorite({ iduser, idDepartment: departmentId });
-                console.log('Departamento agregado a favoritos');
+                Alert.alert('Departamento agregado a favoritos');
             }
         } catch (error) {
             console.log('Error handling favorite:', error);
         }
+    };
+
+    const handleReserveNow = () => {
+        setIsProcessing(true);
+
+        setTimeout(() => {
+            setIsProcessing(false);
+            setIsAvailable(false);
+            Alert.alert('Reserva', 'Esta pantalla está en proceso, muchas gracias por usar nuestra app');
+        }, 3000);
     };
 
     if (!department) {
@@ -126,8 +138,10 @@ const DetailsPage = () => {
                     <Text style={styles.reviewsButtonText}>Reseñas</Text>
                 </Pressable>
                 <View style={styles.priceButtonContainer}>
-                    <Pressable style={styles.priceButton}>
-                        <Text style={styles.priceButtonText}>Reservar ahora</Text>
+                    <Pressable style={styles.priceButton} onPress={handleReserveNow} disabled={isProcessing}>
+                        <Text style={styles.priceButtonText}>
+                            {isProcessing ? 'Procesando...' : 'Reservar ahora'}
+                        </Text>
                     </Pressable>
                 </View>
             </ScrollView>

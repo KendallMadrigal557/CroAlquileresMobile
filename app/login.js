@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -38,7 +38,8 @@ const LoginPage = () => {
                 setLoggedIn(true);
                 setUserId(authenticatedUser._id);
             } else {
-                console.log('Credenciales inválidas');
+                Alert.alert('Credenciales inválidas',
+                'Por favor, vuelve a intentarlo.');
             }
         } catch (error) {
             console.log(error.message);

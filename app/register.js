@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import NavBar from '../components/navbar/navbar';
@@ -13,7 +13,6 @@ const RegisterPage = () => {
         password: '',
         confirmPassword: '',
     });
-    const [errorMessage, setErrorMessage] = useState('');
 
     const handleChangeText = (key, value) => {
         setUserData(prevState => ({ ...prevState, [key]: value }));
@@ -27,14 +26,31 @@ const RegisterPage = () => {
         try {
             const { confirmPassword, ...userDataWithoutConfirm } = userData;
             const response = await UserService.createUser(userDataWithoutConfirm);
-            console.log('User registered:', response);
-            // Aquí puedes redirigir al usuario a la página de inicio de sesión o realizar otras acciones
+
+            Alert.alert(
+                'Registro exitoso',
+                'Por favor, inicia sesión.',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => navigation.navigate('login'),
+                    },
+                ]
+            );
         } catch (error) {
             console.log('Error registering user:', error);
             if (error.response && error.response.data && error.response.data.message) {
-                setErrorMessage(error.response.data.message);
+                console.log(error.response.data.message);
             } else {
-                setErrorMessage('Error al registrar el usuario.');
+                Alert.alert(
+                    'Error al registrar',
+                    'Error al registrar el usuario.',
+                    [
+                        {
+                            text: 'OK',
+                        },
+                    ]
+                );
             }
         }
     };
@@ -109,11 +125,6 @@ const RegisterPage = () => {
                     </View>
                 </View>
             </ScrollView>
-            {errorMessage ? (
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{errorMessage}</Text>
-                </View>
-            ) : null}
             <NavBar />
         </View>
     );
@@ -216,15 +227,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#2f3030',
         padding: 10,
         borderRadius: 5,
-    },
-    errorContainer: {
-        backgroundColor: 'red',
-        padding: 10,
-        alignItems: 'center',
-    },
-    errorText: {
-        color: 'white',
-        fontWeight: 'bold',
     },
 });
 

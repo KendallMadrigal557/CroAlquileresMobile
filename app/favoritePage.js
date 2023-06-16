@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Pressable } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import NavBar from '../components/navbar/navbar';
 import DepartmentSearch from '../components/Department/DepartmentSeacrh/departmentSearch';
@@ -18,7 +18,7 @@ export default function FavoritePage() {
             try {
                 const userId = await AsyncStorage.getItem('user');
                 if (!userId) {
-                    // No hay usuario logueado, mostrar mensaje de aviso
+                    Alert.alert('No hay usuario logueado')
                     setLoading(false);
                     return;
                 }
