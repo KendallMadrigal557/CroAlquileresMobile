@@ -21,7 +21,7 @@ class FavoriteService {
     }
     static async getFavoritesByUserId(userId) {
         try {
-            const response = await axios.get(`${API_URL}/favorite?userId=${userId}`);
+            const response = await axios.get(`${API_URL}/favorite?userid=${userId}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);

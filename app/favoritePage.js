@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import NavBar from '../components/navbar/navbar';
-import DepartmentSearch from '../components/Department/DepartmentSeacrh/departmentSearch';
 import DepartmentService from '../services/department.service';
 import FavoriteService from '../services/favorite.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,24 +12,36 @@ export default function FavoritePage() {
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
+    const handleDepartmentCardPress = (department) => {
+        navigation.navigate('detailsDepartment', { departmentId: department._id });
+    };
     useEffect(() => {
         const fetchFavoriteDepartments = async () => {
             try {
-                const userId = await AsyncStorage.getItem('user');
-                if (!userId) {
-                    Alert.alert('No hay usuario logueado')
+                const user = await AsyncStorage.getItem('user');
+                if (!user) {
+                    setFavoriteDepartments([]);
                     setLoading(false);
                     return;
                 }
-
+    
+                const { _id: userId } = JSON.parse(user);
+    
                 const favorites = await FavoriteService.getFavoritesByUserId(userId);
+    
+                if (favorites.length === 0) {
+                    setFavoriteDepartments([]);
+                    setLoading(false);
+                    return;
+                }
+    
                 const departmentIds = favorites.map((favorite) => favorite.idDepartment);
-
+    
                 const departments = await DepartmentService.getDepartments();
                 const favoriteDepartments = departments.filter((department) =>
                     departmentIds.includes(department._id)
                 );
-
+    
                 setFavoriteDepartments(favoriteDepartments);
                 setLoading(false);
             } catch (error) {
@@ -38,20 +49,14 @@ export default function FavoritePage() {
                 setLoading(false);
             }
         };
-
+    
         fetchFavoriteDepartments();
     }, []);
-
-    const handleDepartmentCardPress = (department) => {
-        navigation.navigate('detailsDepartment', { departmentId: department._id });
-    };
-
     return (
         <View style={styles.container}>
             <View style={styles.header}></View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
-                <DepartmentSearch />
                 {loading ? (
                     <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
                 ) : favoriteDepartments.length === 0 ? (

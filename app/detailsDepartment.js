@@ -32,15 +32,15 @@ const DetailsPage = () => {
     useEffect(() => {
         const checkIsFavorite = async () => {
             try {
-                const userId = await AsyncStorage.getItem('user');
+                const user = await AsyncStorage.getItem('user');
+                const { _id: userId } = JSON.parse(user);
                 const favorites = await FavoriteService.getFavoritesByUserId(userId);
-                const favoriteDepartmentIds = favorites.map((favorite) => favorite.idDepartment);
-                setFavoriteStatus(favoriteDepartmentIds.includes(departmentId));
+                setFavoriteStatus(favorites.some((favorite) => favorite.idDepartment === departmentId));
             } catch (error) {
                 console.log('Error fetching favorite departments:', error);
             }
         };
-
+    
         checkIsFavorite();
     }, [departmentId]);
 
