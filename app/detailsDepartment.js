@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Image, Text, Pressable, ScrollView } from 'react-native';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/navbar/navbar';
 import DepartmentService from '../services/department.service';
+import FavoriteService from '../services/favorite.service';
 
 const DetailsPage = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { departmentId } = route.params;
     const [department, setDepartment] = useState(null);
+    const [favoriteStatus, setFavoriteStatus] = useState(false);
 
     useEffect(() => {
         const fetchDepartment = async () => {
@@ -24,6 +27,21 @@ const DetailsPage = () => {
         fetchDepartment();
     }, [departmentId]);
 
+    useEffect(() => {
+        const checkIsFavorite = async () => {
+            try {
+                const userId = await AsyncStorage.getItem('user');
+                const favorites = await FavoriteService.getFavoritesByUserId(userId);
+                const favoriteDepartmentIds = favorites.map((favorite) => favorite.idDepartment);
+                setFavoriteStatus(favoriteDepartmentIds.includes(departmentId));
+            } catch (error) {
+                console.log('Error fetching favorite departments:', error);
+            }
+        };
+
+        checkIsFavorite();
+    }, [departmentId]);
+
     const goBack = () => {
         navigation.goBack();
     };
@@ -32,7 +50,37 @@ const DetailsPage = () => {
         navigation.navigate('review', { departmentId: department._id });
     };
 
-    const handleFavoritePress = () => { };
+    const handleFavoritePress = async () => {
+        try {
+            const user = await AsyncStorage.getItem('user');
+
+            if (!user) {
+                console.log('Usuario no autenticado');
+                return;
+            }
+
+            const iduser = JSON.parse(user)._id;
+
+            if (!departmentId) {
+                console.log('ID de departamento no disponible');
+                return;
+            }
+
+            const favorites = await FavoriteService.getFavoritesByUserId(iduser);
+            const isFavorite = favorites.some((favorite) => favorite.idDepartment === departmentId);
+
+            if (isFavorite) {
+                const favorite = favorites.find((favorite) => favorite.idDepartment === departmentId);
+                await FavoriteService.deleteFavorite(favorite._id);
+                console.log('Departamento eliminado de favoritos');
+            } else {
+                await FavoriteService.createFavorite({ iduser, idDepartment: departmentId });
+                console.log('Departamento agregado a favoritos');
+            }
+        } catch (error) {
+            console.log('Error handling favorite:', error);
+        }
+    };
 
     if (!department) {
         return null;
@@ -45,12 +93,19 @@ const DetailsPage = () => {
                     <Entypo name="chevron-left" size={24} color="white" />
                 </Pressable>
                 <Pressable onPress={handleFavoritePress} style={styles.favoriteButton}>
-                    <MaterialIcons name="favorite-border" size={24} color="white" />
+                    <MaterialIcons
+                        name={favoriteStatus ? 'favorite' : 'favorite-border'}
+                        size={24}
+                        color="white"
+                    />
                 </Pressable>
             </View>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
                 <View style={styles.priceContainer}>
-                    <Image source={{ uri: `http://192.168.0.2:3002/uploads/${department.image}` }} style={styles.image} />
+                    <Image
+                        source={{ uri: `http://192.168.0.2:3002/uploads/${department.image}` }}
+                        style={styles.image}
+                    />
                     <View style={styles.overlay}>
                         <Text style={styles.price}>{department.price}</Text>
                     </View>
@@ -80,6 +135,7 @@ const DetailsPage = () => {
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
