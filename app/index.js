@@ -9,6 +9,8 @@ import DepartmentCard from '../components/Department/cardDepartment/carddepartme
 export default function Page() {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filteredDepartments, setFilteredDepartments] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -16,6 +18,7 @@ export default function Page() {
       try {
         const departments = await DepartmentService.getDepartments();
         setDepartments(departments);
+        setFilteredDepartments(departments);
       } catch (error) {
         console.log('Error fetching departments:', error);
       } finally {
@@ -30,18 +33,28 @@ export default function Page() {
     navigation.navigate('detailsDepartment', { departmentId: department._id });
   };
 
+  const filterDepartments = (text) => {
+    setSearchText(text);
+    const filtered = departments.filter(
+      (department) =>
+        department.place.toLowerCase().includes(text.toLowerCase()) ||
+        department.location.toLowerCase().trim().includes(text.toLowerCase())
+    );
+    setFilteredDepartments(filtered);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}></View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
-        <DepartmentSearch />
+        <DepartmentSearch onSearch={filterDepartments} />
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
-        ) : departments.length === 0 ? (
+        ) : filteredDepartments.length === 0 ? (
           <Text style={styles.noDepartmentsText}>No se encontraron departamentos.</Text>
         ) : (
-          departments.map((department) => (
+          filteredDepartments.map((department) => (
             <Pressable
               key={department._id}
               onPress={() => handleDepartmentCardPress(department)}

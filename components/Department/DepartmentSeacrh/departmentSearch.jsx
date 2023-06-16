@@ -14,7 +14,7 @@ const DepartmentSearch = ({ onSearch }) => {
         <View style={styles.searchContainer}>
             <TextInput
                 style={[styles.searchInput, {color: 'white'}]}
-                placeholder="Buscar por lugar o habitaciones"
+                placeholder="Buscar por nombre del lugar"
                 placeholderTextColor="white"
                 value={searchDepartment}
                 onChangeText={setSearchDepartment}
