@@ -46,6 +46,37 @@ class UserService {
             throw new Error(error.response.data.message);
         }
     }
+
+    static async enableTwoFactor(id, email) {
+        try {
+            const response = await axios.post(`${API_URL}/user/${id}/enable-two-factor`, { email });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async loginUser(email, password, twoFactorCode) {
+        try {
+            const response = await axios.post(`${API_URL}/login`, {
+                email,
+                password,
+                twoFactorCode
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async sendUnlockAccountEmail(email, unlockCode) {
+        try {
+            const response = await axios.post(`${API_URL}/send-unlock-email`, { email, unlockCode });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
 }
 
 export default UserService;
