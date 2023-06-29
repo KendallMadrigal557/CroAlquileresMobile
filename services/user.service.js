@@ -56,13 +56,9 @@ class UserService {
         }
     }
 
-    static async loginUser(email, password, twoFactorCode) {
+    static async loginUser(email, password) {
         try {
-            const response = await axios.post(`${API_URL}/login`, {
-                email,
-                password,
-                twoFactorCode
-            });
+            const response = await axios.post(`${API_URL}/login`, { email, password });
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
@@ -77,6 +73,8 @@ class UserService {
             throw new Error(error.response.data.message);
         }
     }
+
+    
 }
 
 export default UserService;

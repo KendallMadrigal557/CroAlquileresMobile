@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
 import NavBar from '../components/navbar/navbar';
 import UserService from '../services/user.service';
 
@@ -13,6 +14,7 @@ const RegisterPage = () => {
         password: '',
         confirmPassword: '',
     });
+    const [expiration, setExpiration] = useState(30);
 
     const handleChangeText = (key, value) => {
         setUserData(prevState => ({ ...prevState, [key]: value }));
@@ -25,8 +27,13 @@ const RegisterPage = () => {
     const handleRegister = async () => {
         try {
             const { confirmPassword, ...userDataWithoutConfirm } = userData;
-            const response = await UserService.createUser(userDataWithoutConfirm);
-
+            const response = await UserService.createUser({
+                name: userDataWithoutConfirm.name,
+                email: userDataWithoutConfirm.email,
+                password: userDataWithoutConfirm.password,
+                passwordDuration: expiration, 
+            });
+    
             Alert.alert(
                 'Registro exitoso',
                 'Por favor, inicia sesión.',
@@ -40,17 +47,9 @@ const RegisterPage = () => {
         } catch (error) {
             console.log('Error registering user:', error);
             if (error.response && error.response.data && error.response.data.message) {
-                console.log(error.response.data.message);
+                Alert.alert('Error', error.message);
             } else {
-                Alert.alert(
-                    'Error al registrar',
-                    'Error al registrar el usuario.',
-                    [
-                        {
-                            text: 'OK',
-                        },
-                    ]
-                );
+                Alert.alert('Error', error.message);
             }
         }
     };
@@ -110,6 +109,18 @@ const RegisterPage = () => {
                             onChangeText={text => handleChangeText('confirmPassword', text)}
                             secureTextEntry
                         />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.inputLabel}>Expiración de Contraseña</Text>
+                        <Picker
+                            selectedValue={expiration}
+                            style={styles.picker}
+                            onValueChange={(itemValue) => setExpiration(itemValue)}
+                        >
+                            <Picker.Item label="30 días" value={30} />
+                            <Picker.Item label="60 días" value={60} />
+                            <Picker.Item label="90 días" value={90} />
+                        </Picker>
                     </View>
                     <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
                         <Text style={styles.registerButtonText}>Registrarse</Text>
@@ -199,6 +210,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
+    },
+    picker: {
+        borderWidth: 1,
+        borderColor: '#CCCCCC',
+        borderRadius: 5,
+        color: '#FFFFFF',
     },
     orText: {
         color: '#FFFFFF',
