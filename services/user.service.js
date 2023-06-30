@@ -73,7 +73,23 @@ class UserService {
             throw new Error(error.response.data.message);
         }
     }
-
+    static async sendVerificationCode(email) {
+        try {
+            const response = await axios.post(`${API_URL}/send-verification-code`, { email });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+    
+    static async changePassword(email, password, verificationCode) {
+        try {
+            const response = await axios.post(`${API_URL}/change-password`, { email, password, verificationCode });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
     
 }
 
