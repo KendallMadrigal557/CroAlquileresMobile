@@ -55,11 +55,9 @@ const LoginPage = () => {
                     iduser: user._id,
                     ipAddress: ipAddress
                 };
-                
-                console.log(user, auditLogData);
 
                 await AuditLogService.createAuditLog(auditLogData);
-                
+
                 await AsyncStorage.setItem('user', JSON.stringify(user));
                 setLoggedIn(true);
 
@@ -69,7 +67,7 @@ const LoginPage = () => {
             }
         } catch (error) {
             Alert.alert('Error', error.message);
-            console.log( 'Error', error);
+            console.log('Error', error);
         }
     };
 
@@ -83,7 +81,6 @@ const LoginPage = () => {
     const handleVerifyTwoFactorCode = async () => {
         try {
             const userData = await AsyncStorage.getItem('user');
-            console.log(userData);
             if (userData) {
                 const { email } = JSON.parse(userData);
                 const users = await UserService.getUsers();
@@ -115,7 +112,9 @@ const LoginPage = () => {
         }
     };
 
-
+    const goToChangePassword = () => {
+        navigation.navigate('changePass');
+    };
     const goToRegister = () => {
         navigation.navigate('register');
     };
@@ -192,6 +191,9 @@ const LoginPage = () => {
                 </View>
                 <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                     <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.changePasswordButton} onPress={goToChangePassword}>
+                    <Text style={styles.registerButtonText}>Cambiar Contraseña</Text>
                 </TouchableOpacity>
                 <View style={styles.orContainer}>
                     <Text style={styles.orText}>o</Text>
