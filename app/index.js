@@ -38,7 +38,9 @@ export default function Page() {
     const filtered = departments.filter(
       (department) =>
         department.place.toLowerCase().includes(text.toLowerCase()) ||
-        department.location.toLowerCase().trim().includes(text.toLowerCase())
+        department.provincia.toLowerCase().trim().includes(text.toLowerCase()) ||
+        department.canton.toLowerCase().trim().includes(text.toLowerCase()) ||
+        department.distrito.toLowerCase().trim().includes(text.toLowerCase())
     );
     setFilteredDepartments(filtered);
   };
@@ -69,7 +71,9 @@ export default function Page() {
                 image={`http:/192.168.0.2:3002/uploads/${department.image}`}
                 price={department.price}
                 name={department.place}
-                location={department.location}
+                provincia={department.provincia}
+                canton={department.canton}
+                distrito={department.distrito}
               />
             </Pressable>
           ))

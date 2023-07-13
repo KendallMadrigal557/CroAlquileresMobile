@@ -15,6 +15,7 @@ export default function FavoritePage() {
     const handleDepartmentCardPress = (department) => {
         navigation.navigate('detailsDepartment', { departmentId: department._id });
     };
+
     useEffect(() => {
         const fetchFavoriteDepartments = async () => {
             try {
@@ -24,24 +25,24 @@ export default function FavoritePage() {
                     setLoading(false);
                     return;
                 }
-    
+
                 const { _id: userId } = JSON.parse(user);
-    
+
                 const favorites = await FavoriteService.getFavoritesByUserId(userId);
-    
+
                 if (favorites.length === 0) {
                     setFavoriteDepartments([]);
                     setLoading(false);
                     return;
                 }
-    
+
                 const departmentIds = favorites.map((favorite) => favorite.idDepartment);
-    
+
                 const departments = await DepartmentService.getDepartments();
                 const favoriteDepartments = departments.filter((department) =>
                     departmentIds.includes(department._id)
                 );
-    
+
                 setFavoriteDepartments(favoriteDepartments);
                 setLoading(false);
             } catch (error) {
@@ -49,9 +50,10 @@ export default function FavoritePage() {
                 setLoading(false);
             }
         };
-    
+
         fetchFavoriteDepartments();
     }, []);
+
     return (
         <View style={styles.container}>
             <View style={styles.header}></View>
@@ -77,7 +79,9 @@ export default function FavoritePage() {
                                 image={`http:/192.168.0.2:3002/uploads/${department.image}`}
                                 price={department.price}
                                 name={department.place}
-                                location={department.location}
+                                provincia={department.provincia}
+                                canton={department.canton}
+                                distrito={department.distrito}
                             />
                         </Pressable>
                     ))
@@ -88,6 +92,7 @@ export default function FavoritePage() {
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

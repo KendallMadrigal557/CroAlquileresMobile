@@ -3,7 +3,9 @@ import { StyleSheet, View, Image, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "./cardDept.style";
 
-const DepartmentCard = ({ image, price, name, location }) => {
+const DepartmentCard = ({ image, price, name, provincia, canton, distrito }) => {
+    const location = `${provincia}, ${canton}, ${distrito}`;
+
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imageContainer}>
