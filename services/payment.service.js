@@ -1,46 +1,46 @@
 import axios from 'axios';
-import API_MUNI from '../config/config';
+import API_BANK from '../config/config';
 
-class PlaceService {
-    static async createPlace(placeData) {
+class PaymentService {
+    static async createPayment(paymentData) {
         try {
-            const response = await axios.post(`${API_MUNI}/place`, placeData);
+            const response = await axios.post(`${API_BANK}/payments`, paymentData);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
         }
     }
 
-    static async getPlaces() {
+    static async getAllPayments() {
         try {
-            const response = await axios.get(`${API_MUNI}/place`);
+            const response = await axios.get(`${API_BANK}/payments`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
         }
     }
 
-    static async getPlaceById(id) {
+    static async getPaymentById(id) {
         try {
-            const response = await axios.get(`${API_MUNI}/place/${id}`);
+            const response = await axios.get(`${API_BANK}/payments/${id}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
         }
     }
 
-    static async updatePlace(id, placeData) {
+    static async updatePayment(id, paymentData) {
         try {
-            const response = await axios.put(`${API_MUNI}/place/${id}`, placeData);
+            const response = await axios.put(`${API_BANK}/payments/${id}`, paymentData);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
         }
     }
 
-    static async deletePlace(id) {
+    static async deletePayment(id) {
         try {
-            const response = await axios.delete(`${API_MUNI}/place/${id}`);
+            const response = await axios.delete(`${API_BANK}/payments/${id}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
@@ -48,4 +48,4 @@ class PlaceService {
     }
 }
 
-export default PlaceService;
+export default PaymentService;
