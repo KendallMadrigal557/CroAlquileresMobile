@@ -48,6 +48,9 @@ const DetailsPage = () => {
         navigation.goBack();
     };
 
+    const handleInsurancePress = () => {
+        navigation.navigate('insurance');
+    };
     const handleReviewsPress = () => {
         navigation.navigate('review', { departmentId: department._id });
     };
@@ -138,11 +141,11 @@ const DetailsPage = () => {
                     <Text style={styles.reviewsButtonText}>Reseñas</Text>
                 </Pressable>
                 <View style={styles.priceButtonContainer}>
-                    <Pressable style={styles.priceButton} onPress={handleReserveNow} disabled={isProcessing}>
-                        <Text style={styles.priceButtonText}>
-                            {isProcessing ? 'Procesando...' : 'Reservar ahora'}
-                        </Text>
-                    </Pressable>
+                <Pressable style={styles.priceButton} onPress={handleInsurancePress} disabled={isProcessing}>
+                    <Text style={styles.priceButtonText}>
+                        {isProcessing ? 'Procesando...' : 'Reservar ahora'}
+                    </Text>
+                </Pressable>
                 </View>
             </ScrollView>
             <NavBar />
