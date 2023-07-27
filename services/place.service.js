@@ -1,5 +1,5 @@
 import axios from 'axios';
-import API_MUNI from '../config/config';
+import {API_MUNI} from '../config/config';
 
 class PlaceService {
     static async createPlace(placeData) {

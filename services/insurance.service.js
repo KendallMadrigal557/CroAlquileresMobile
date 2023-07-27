@@ -1,5 +1,5 @@
 import axios from 'axios';
-import API_INSURANCE from '../config/config';
+import {API_INSURANCE} from '../config/config';
 
 class InsuranceService {
     static async createInsurance(insuranceData) {

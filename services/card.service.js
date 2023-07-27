@@ -1,5 +1,5 @@
 import axios from 'axios';
-import API_BANK from '../config/config';
+import {API_BANK} from '../config/config';
 
 class CreditCardService {
     static async createCreditCard(creditCardData) {

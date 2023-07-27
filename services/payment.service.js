@@ -1,5 +1,5 @@
 import axios from 'axios';
-import API_BANK from '../config/config';
+import {API_BANK} from '../config/config';
 
 class PaymentService {
     static async createPayment(paymentData) {
