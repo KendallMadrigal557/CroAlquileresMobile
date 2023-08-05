@@ -1,17 +1,29 @@
-import React , { useEffect, useState } from "react";
-import { View, ScrollView, SafeAreaView, Text, StyleSheet, TouchableOpacity } from "react-native";
-import InsuranceCard from "../components/Insurance/cardInsurance/cardInsurance.jsx";
+import React, { useEffect, useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+    View,
+    ScrollView,
+    SafeAreaView,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+} from 'react-native';
+import InsuranceCard from '../components/Insurance/cardInsurance/cardInsurance.jsx';
 import NavBar from '../components/navbar/navbar';
-import InsuranceService from '../services/insurance.service.js'
+import InsuranceService from '../services/insurance.service.js';
 
 const InsurancePage = () => {
+    const navigation = useNavigation();
     const [insuranceData, setInsuranceData] = useState([]);
+    const [selectedInsurances, setSelectedInsurances] = useState([]);
+    const route = useRoute();
+    const { departmentPrice } = route.params; 
 
     useEffect(() => {
         const fetchInsuranceData = async () => {
             try {
                 const response = await InsuranceService.getAllInsurances();
-                setInsuranceData(response); 
+                setInsuranceData(response);
             } catch (error) {
                 console.error('Error al obtener los datos de la API:', error);
             }
@@ -19,22 +31,48 @@ const InsurancePage = () => {
         fetchInsuranceData();
     }, []);
 
+    const handleInsuranceSelection = (insuranceId) => {
+        setSelectedInsurances((prevSelectedInsurances) =>
+            prevSelectedInsurances.includes(insuranceId)
+                ? prevSelectedInsurances.filter((id) => id !== insuranceId)
+                : [...prevSelectedInsurances, insuranceId]
+        );
+    };
+    const getSelectedInsurancesData = () => {
+        return insuranceData.filter((insurance) => selectedInsurances.includes(insurance._id));
+    };
+    
+    const handlePaymentButtonPress = () => {
+        navigation.navigate('payment', {
+            selectedInsurancePrices: getSelectedInsurancesData().map((insurance) => insurance.price),
+            departmentPrice,
+        });
+    };
+    
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <Text style={styles.header}>Available Insurance Options</Text>
                 {insuranceData.map((insurance) => (
-                    <InsuranceCard
+                    <TouchableOpacity
                         key={insurance._id}
-                        type={insurance.type}
-                        description={insurance.description}
-                        price={insurance.price}
-                        companyName={insurance.company.name}
-                    />
+                        style={[
+                            styles.insuranceCard,
+                            selectedInsurances.includes(insurance._id) && styles.selectedCard,
+                        ]}
+                        onPress={() => handleInsuranceSelection(insurance._id)}
+                    >
+                        <InsuranceCard
+                            type={insurance.type}
+                            description={insurance.description}
+                            price={insurance.price}
+                            companyName={insurance.company.name}
+                        />
+                    </TouchableOpacity>
                 ))}
                 <TouchableOpacity
                     style={styles.processPaymentButton}
-                    onPress={() => navigation.navigate('PaymentScreen')}
+                    onPress={handlePaymentButtonPress}
                 >
                     <Text style={styles.processPaymentButtonText}>Procesar Pago</Text>
                 </TouchableOpacity>
@@ -49,7 +87,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#000000',
         padding: 24,
-        
     },
     header: {
         marginTop: 30,
@@ -57,51 +94,15 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
         paddingBottom: 80,
-        marginBottom: 80
+        marginBottom: 80,
     },
-    loadingIndicator: {
-        marginTop: 50,
-    },
-    pickersContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    inputContainer: {
-        flex: 1,
-        marginRight: 10,
-    },
-    inputLabel: {
-        color: '#ffffff',
-        marginBottom: 5,
-    },
-    picker: {
-        backgroundColor: '#222222',
-        borderRadius: 5,
-        padding: 5,
-        color: '#ffffff',
-    },
-    noDepartmentsText: {
-        textAlign: 'center',
-        fontSize: 18,
-        marginTop: 50,
-        color: '#ffffff',
-    },
-    departmentCard: {
+    insuranceCard: {
         marginBottom: 10,
     },
-    clearButton: {
-        backgroundColor: '#222222',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-        alignSelf: 'flex-end',
-        marginBottom: 10,
-    },
-    clearButtonText: {
-        color: '#ffffff',
-        fontWeight: 'bold',
-        borderRadius: 30,
+    selectedCard: {
+        borderColor: '#7066e5',
+        borderWidth: 2,
+        borderRadius: 10,
     },
     processPaymentButton: {
         backgroundColor: '#7066e5',

@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/navbar/navbar';
 import DepartmentService from '../services/department.service';
 import FavoriteService from '../services/favorite.service';
-
+import {ipAPI} from '../config/config';
 const DetailsPage = () => {
     const navigation = useNavigation();
     const route = useRoute();
@@ -14,6 +14,8 @@ const DetailsPage = () => {
     const [department, setDepartment] = useState(null);
     const [favoriteStatus, setFavoriteStatus] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [userId, setUserId] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
 
     useEffect(() => {
@@ -30,6 +32,20 @@ const DetailsPage = () => {
     }, [departmentId]);
 
     useEffect(() => {
+        const checkLoginStatus = async () => {
+            const user = await AsyncStorage.getItem('user');
+
+            if (user) {
+                const { _id } = JSON.parse(user);
+                setUserId(_id);
+                setLoggedIn(true);
+            }
+        };
+
+        checkLoginStatus();
+    }, []);
+
+    useEffect(() => {
         const checkIsFavorite = async () => {
             try {
                 const user = await AsyncStorage.getItem('user');
@@ -40,7 +56,7 @@ const DetailsPage = () => {
                 console.log('Error fetching favorite departments:', error);
             }
         };
-    
+
         checkIsFavorite();
     }, [departmentId]);
 
@@ -49,7 +65,13 @@ const DetailsPage = () => {
     };
 
     const handleInsurancePress = () => {
-        navigation.navigate('insurance');
+        if (!loggedIn) {
+            Alert.alert('Debe iniciar sesión para realizar una reserva.');
+
+            return;
+        }
+    
+        navigation.navigate('insurance', { departmentPrice: department?.price });
     };
     const handleReviewsPress = () => {
         navigation.navigate('review', { departmentId: department._id });
@@ -87,15 +109,6 @@ const DetailsPage = () => {
         }
     };
 
-    const handleReserveNow = () => {
-        setIsProcessing(true);
-
-        setTimeout(() => {
-            setIsProcessing(false);
-            setIsAvailable(false);
-            Alert.alert('Reserva', 'Esta pantalla está en proceso, muchas gracias por usar nuestra app');
-        }, 3000);
-    };
 
     if (!department) {
         return null;
@@ -118,7 +131,7 @@ const DetailsPage = () => {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
                 <View style={styles.priceContainer}>
                     <Image
-                        source={{ uri: `http://192.168.0.2:3002/uploads/${department.image}` }}
+                        source={{ uri: `http://${ipAPI}:3002/uploads/${department.image}` }}
                         style={styles.image}
                     />
                     <View style={styles.overlay}>
@@ -131,7 +144,7 @@ const DetailsPage = () => {
                         <View style={styles.iconContainer}>
                             <MaterialIcons name="location-on" size={16} color="white" style={styles.icon} />
                         </View>
-                        <Text style={styles.location}>{department.location}</Text>
+                        <Text style={styles.location}>{department.provincia +', '+ department.canton + ', ' + department.distrito}</Text>
                     </View>
                 </View>
                 <View style={styles.cardContainer}>
@@ -141,11 +154,11 @@ const DetailsPage = () => {
                     <Text style={styles.reviewsButtonText}>Reseñas</Text>
                 </Pressable>
                 <View style={styles.priceButtonContainer}>
-                <Pressable style={styles.priceButton} onPress={handleInsurancePress} disabled={isProcessing}>
-                    <Text style={styles.priceButtonText}>
-                        {isProcessing ? 'Procesando...' : 'Reservar ahora'}
-                    </Text>
-                </Pressable>
+                    <Pressable style={styles.priceButton} onPress={handleInsurancePress} disabled={isProcessing}>
+                        <Text style={styles.priceButtonText}>
+                            {isProcessing ? 'Procesando...' : 'Reservar ahora'}
+                        </Text>
+                    </Pressable>
                 </View>
             </ScrollView>
             <NavBar />

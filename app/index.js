@@ -7,7 +7,7 @@ import DepartmentService from '../services/department.service';
 import DepartmentCard from '../components/Department/cardDepartment/carddepartment';
 import PlaceService from '../services/place.service';
 import { Picker } from '@react-native-picker/picker';
-
+import {ipAPI} from '../config/config';
 export default function Page() {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -206,7 +206,7 @@ export default function Page() {
               ]}
             >
               <DepartmentCard
-                image={`http:/192.168.0.2:3002/uploads/${department.image}`}
+                image={`http://${ipAPI}:3002/uploads/${department.image}`}
                 price={department.price}
                 name={department.place}
                 provincia={department.provincia}
