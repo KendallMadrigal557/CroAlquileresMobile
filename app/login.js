@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';  
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserService from '../services/user.service';
@@ -9,6 +10,14 @@ import AuditLogService from '../services/auditLog.service';
 import axios from 'axios';
 
 const LoginPage = () => {
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -239,7 +248,7 @@ const styles = StyleSheet.create({
     title: {
         color: '#FFFFFF',
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     inputContainer: {
         width: '100%',
@@ -251,6 +260,7 @@ const styles = StyleSheet.create({
     inputLabel: {
         color: '#FFFFFF',
         marginBottom: 8,
+        fontFamily: 'UbuntuBold',
         fontSize: 18,
     },
     input: {
@@ -259,6 +269,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         color: '#FFFFFF',
         padding: 15,
+        fontFamily: 'UbuntuItalic',
         backgroundColor: "#1e1e1e",
         marginRight: 8,
         fontSize: 16,
@@ -267,14 +278,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#491ea2',
         borderRadius: 50,
         padding: 12,
+        fontFamily: 'UbuntuBold',
         alignItems: 'center',
+        marginTop: 8,
         marginBottom: 16,
         width: '100%',
+    },
+    verifyButtonText:{
+        fontFamily: 'UbuntuBold',
+        color: "#FFFFFF",
     },
     loginButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     orContainer: {
         flexDirection: 'row',
@@ -298,7 +315,7 @@ const styles = StyleSheet.create({
     registerButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     back: {
         position: 'absolute',
@@ -312,7 +329,7 @@ const styles = StyleSheet.create({
     loggedInText: {
         color: '#FFFFFF',
         fontSize: 20,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
         marginBottom: 16,
     },
     logoutButton: {

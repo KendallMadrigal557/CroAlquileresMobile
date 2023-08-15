@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import PaymentService  from '../services/payment.service';
-
+import { useFonts } from 'expo-font';
 
 const PaymentScreen = () => {
     const [cardNumber, setCardNumber] = useState('');
@@ -13,7 +13,14 @@ const PaymentScreen = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const route = useRoute();
     const navigation = useNavigation(); 
-
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
     const { selectedInsurancePrices = [], departmentPrice = 0 } = route?.params || {};
     
     const calculateTotalPayment = () => {
@@ -64,7 +71,7 @@ const PaymentScreen = () => {
             <View style={styles.header}>
                 <Text style={styles.title}>Ingrese los datos de la tarjeta:</Text>
                 <TouchableOpacity onPress={() => alert('Botón de volver presionado')} style={styles.back}>
-                    <Text style={{ color: '#FFFFFF', fontSize: 16 }}>Volver</Text>
+                    <Text style={{ color: '#FFFFFF', fontSize: 16 ,fontFamily: 'UbuntuBold' }}>Volver</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.content}>
@@ -138,6 +145,8 @@ const PaymentScreen = () => {
 
 const styles = StyleSheet.create({
     containerDark: {
+        width: '100%',
+        height: '100%',
         flex: 1,
         backgroundColor: '#222222',
         padding: 24,
@@ -151,7 +160,7 @@ const styles = StyleSheet.create({
     title: {
         color: '#FFFFFF',
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
         flex: 1,
     },
     back: {
@@ -169,6 +178,7 @@ const styles = StyleSheet.create({
     },
     inputLabel: {
         color: '#FFFFFF',
+        fontFamily: 'UbuntuBoldItalic',
         marginBottom: 8,
         fontSize: 18,
     },
@@ -178,19 +188,23 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         color: '#FFFFFF',
         padding: 15,
+        fontFamily: 'UbuntuRegular',
         backgroundColor: '#1e1e1e',
         fontSize: 16,
     },
     expirationContainer: {
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
     expirationInput: {
+        width: '60%',
         borderWidth: 1,
         borderColor: '#1f2025',
         borderRadius: 50,
         color: '#FFFFFF',
         padding: 15,
+        fontFamily: 'UbuntuRegular',
         backgroundColor: '#1e1e1e',
         flex: 0.45,
         fontSize: 16,
@@ -198,6 +212,7 @@ const styles = StyleSheet.create({
     expirationDivider: {
         color: '#FFFFFF',
         fontSize: 16,
+        fontFamily: 'UbuntuRegular',
         alignSelf: 'center',
         paddingHorizontal: 8,
     },
@@ -211,7 +226,7 @@ const styles = StyleSheet.create({
     payButtonText: {
         color: '#FFFFFF',
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     processingContainer: {
         ...StyleSheet.absoluteFillObject,
@@ -221,6 +236,7 @@ const styles = StyleSheet.create({
     },
     processingText: {
         color: '#FFFFFF',
+        fontFamily: 'UbuntuRegular',
         fontSize: 20,
         marginTop: 16,
     },

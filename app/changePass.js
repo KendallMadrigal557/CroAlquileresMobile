@@ -2,12 +2,22 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import UserService from '../services/user.service';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 
 const ChangePasswordPage = () => {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
 
     const handleChangePassword = async () => {
         try {
@@ -100,7 +110,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
         color: '#FFFFFF',
         marginBottom: 20,
     },
@@ -112,6 +122,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 8,
         color: '#FFFFFF',
+        fontFamily: 'UbuntuRegular',
     },
     input: {
         borderWidth: 1,
@@ -119,6 +130,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         color: '#FFFFFF',
         padding: 15,
+        fontFamily: 'UbuntuRegular',
         backgroundColor: "#1e1e1e",
         marginRight: 8,
         fontSize: 16,
@@ -126,6 +138,7 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: '#491ea2',
         padding: 12,
+        marginBottom:10,
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
@@ -133,7 +146,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
 });
 

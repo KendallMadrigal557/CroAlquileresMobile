@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from "../components/navbar/navbar";
 import { useRoute } from '@react-navigation/native';
 import ReviewService from "../services/review.service";
+import { useFonts } from 'expo-font'; 
 
 const ReviewPage = () => {
     const [reviewInput, setReviewInput] = useState("");
@@ -12,7 +13,14 @@ const ReviewPage = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const route = useRoute();
     const { departmentId } = route.params;
-
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+      });
     useEffect(() => {
         const checkLoginStatus = async () => {
             const user = await AsyncStorage.getItem('user');
@@ -99,7 +107,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold",
         marginBottom: 24,
         textAlign: "center",
         color: "#FFFFFF",
@@ -118,10 +126,12 @@ const styles = StyleSheet.create({
     review: {
         fontSize: 16,
         marginBottom: 8,
+        fontFamily: "UbuntuBoldItalic",
         color: "#FFFFFF",
     },
     date: {
         fontSize: 14,
+        fontFamily: "UbuntuLight",
         color: "#CCCCCC",
     },
     scrollViewContent: {

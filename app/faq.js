@@ -2,9 +2,19 @@ import React, { useEffect, useState } from "react";
 import NavBar from '../components/navbar/navbar';
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import FAQService from "../services/faq.service";
+import { useFonts } from 'expo-font';
 
 const FAQPage = () => {
     const [faqData, setFaqData] = useState([]);
+
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
 
     useEffect(() => {
         const fetchFAQs = async () => {
@@ -18,6 +28,7 @@ const FAQPage = () => {
 
         fetchFAQs();
     }, []);
+
 
     return (
         <View style={styles.container}>
@@ -46,8 +57,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     title: {
+        fontFamily: "UbuntuBold",
         fontSize: 24,
-        fontWeight: "bold",
         marginBottom: 24,
         textAlign: "center",
         color: "#FFFFFF",
@@ -65,13 +76,14 @@ const styles = StyleSheet.create({
     },
     question: {
         fontSize: 18,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold",
         marginBottom: 8,
         color: "#FFFFFF",
     },
     answer: {
         fontSize: 16,
         color: "#CCCCCC",
+        fontFamily: "UbuntuLight",
     },
     scrollViewContainer: {
         flexGrow: 1,

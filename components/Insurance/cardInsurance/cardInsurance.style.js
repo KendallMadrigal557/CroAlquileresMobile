@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
     name: {
         color: "white",
         fontSize: 18,
-        fontWeight: "bold",
         marginTop: 12,
     },
     description: {
@@ -21,7 +20,6 @@ const styles = StyleSheet.create({
     price: {
         color: "white",
         fontSize: 16,
-        fontWeight: "bold",
         marginTop: 8,
     },
     companyName: {
