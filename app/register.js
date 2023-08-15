@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import NavBar from '../components/navbar/navbar';
 import UserService from '../services/user.service';
 import PlaceService from '../services/place.service';
+import { useFonts } from 'expo-font';
 
 const RegisterPage = () => {
     const navigation = useNavigation();
@@ -17,6 +18,14 @@ const RegisterPage = () => {
         provincia: '',
         canton: '',
         distrito: '',
+    });
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
     });
     const [expiration, setExpiration] = useState(30);
     const [provincias, setProvincias] = useState([]);
@@ -158,7 +167,7 @@ const RegisterPage = () => {
                             secureTextEntry
                         />
                     </View>
-                    <View style={styles.inputContainer}>
+                    <View style={styles.centerPickerContainer}>
                         <Text style={styles.inputLabel}>Expiración de Contraseña</Text>
                         <Picker
                             selectedValue={expiration}
@@ -169,8 +178,6 @@ const RegisterPage = () => {
                             <Picker.Item label="60 días" value={60} />
                             <Picker.Item label="90 días" value={90} />
                         </Picker>
-                    </View>
-                    <View style={styles.inputContainer}>
                         <Text style={styles.inputLabel}>Provincia</Text>
                         <Picker
                             selectedValue={userData.provincia}
@@ -185,8 +192,6 @@ const RegisterPage = () => {
                                 <Picker.Item key={provincia.value} label={provincia.label} value={provincia.value} />
                             ))}
                         </Picker>
-                    </View>
-                    <View style={styles.inputContainer}>
                         <Text style={styles.inputLabel}>Cantón</Text>
                         <Picker
                             selectedValue={userData.canton}
@@ -201,8 +206,6 @@ const RegisterPage = () => {
                                 <Picker.Item key={canton.value} label={canton.label} value={canton.value} />
                             ))}
                         </Picker>
-                    </View>
-                    <View style={styles.inputContainer}>
                         <Text style={styles.inputLabel}>Distrito</Text>
                         <Picker
                             selectedValue={userData.distrito}
@@ -262,7 +265,7 @@ const styles = StyleSheet.create({
     title: {
         color: '#FFFFFF',
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     inputContainer: {
         width: '100%',
@@ -275,6 +278,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         marginBottom: 8,
         fontSize: 18,
+        fontFamily: 'UbuntuBold',
     },
     input: {
         borderWidth: 1,
@@ -282,6 +286,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         color: '#FFFFFF',
         padding: 15,
+        fontFamily: 'UbuntuItalic',
         backgroundColor: '#1e1e1e',
         marginRight: 8,
         fontSize: 16,
@@ -297,23 +302,33 @@ const styles = StyleSheet.create({
     registerButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     orContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
     },
+    centerPickerContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
     picker: {
-        borderWidth: 1,
+        width: '80%',
+        marginTop: 8,
+        marginBottom: 18,
+        backgroundColor: '#222222',
         borderColor: '#CCCCCC',
         borderRadius: 5,
+        padding: 5,
         color: '#FFFFFF',
+        fontFamily: 'UbuntuBold',
     },
     orText: {
         color: '#FFFFFF',
         fontSize: 16,
         marginHorizontal: 8,
+        fontFamily: 'UbuntuBold',
     },
     loginContainer: {
         flexDirection: 'row',
@@ -323,11 +338,12 @@ const styles = StyleSheet.create({
         color: '#AAAAAA',
         fontSize: 16,
         marginRight: 8,
+        fontFamily: 'UbuntuRegular',
     },
     loginButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     back: {
         position: 'absolute',

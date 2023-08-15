@@ -6,7 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/navbar/navbar';
 import DepartmentService from '../services/department.service';
 import FavoriteService from '../services/favorite.service';
-import {ipAPI} from '../config/config';
+import { ipAPI } from '../config/config';
+import { useFonts } from 'expo-font';
+
 const DetailsPage = () => {
     const navigation = useNavigation();
     const route = useRoute();
@@ -17,6 +19,15 @@ const DetailsPage = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [userId, setUserId] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
+
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
 
     useEffect(() => {
         const fetchDepartment = async () => {
@@ -70,7 +81,7 @@ const DetailsPage = () => {
 
             return;
         }
-    
+
         navigation.navigate('insurance', { departmentPrice: department?.price });
     };
     const handleReviewsPress = () => {
@@ -135,7 +146,7 @@ const DetailsPage = () => {
                         style={styles.image}
                     />
                     <View style={styles.overlay}>
-                        <Text style={styles.price}>{department.price}</Text>
+                        <Text style={styles.price}>{department.price} USD</Text>
                     </View>
                 </View>
                 <View style={styles.detailsContainer}>
@@ -144,7 +155,7 @@ const DetailsPage = () => {
                         <View style={styles.iconContainer}>
                             <MaterialIcons name="location-on" size={16} color="white" style={styles.icon} />
                         </View>
-                        <Text style={styles.location}>{department.provincia +', '+ department.canton + ', ' + department.distrito}</Text>
+                        <Text style={styles.location}>{department.provincia + ', ' + department.canton + ', ' + department.distrito}</Text>
                     </View>
                 </View>
                 <View style={styles.cardContainer}>
@@ -205,7 +216,7 @@ const styles = StyleSheet.create({
     price: {
         color: "white",
         fontSize: 24,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold",
     },
     detailsContainer: {
         marginBottom: 16,
@@ -213,7 +224,7 @@ const styles = StyleSheet.create({
     name: {
         color: "white",
         fontSize: 18,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold",
         marginBottom: 8,
     },
     locationContainer: {
@@ -223,6 +234,7 @@ const styles = StyleSheet.create({
     location: {
         color: "#8e9191",
         fontSize: 14,
+        fontFamily: "UbuntuItalic",
         marginLeft: 4,
     },
     cardContainer: {
@@ -233,6 +245,7 @@ const styles = StyleSheet.create({
     },
     description: {
         color: "white",
+        fontFamily: "UbuntuRegular"
     },
     favoriteButton: {
         paddingTop: 10,
@@ -247,22 +260,24 @@ const styles = StyleSheet.create({
     reviewsButtonText: {
         color: "white",
         fontSize: 16,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold"
     },
     priceButtonContainer: {
         alignItems: "center",
+        fontFamily: "UbuntuBold",
         marginBottom: 16,
     },
     priceButton: {
         backgroundColor: "#7066e5",
         borderRadius: 20,
+        fontFamily: "UbuntuBold",
         paddingVertical: 16,
         paddingHorizontal: 32,
     },
     priceButtonText: {
         color: "white",
         fontSize: 16,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold"
     },
     back: {
         backgroundColor: "#2f3030",

@@ -6,12 +6,21 @@ import DepartmentService from '../services/department.service';
 import FavoriteService from '../services/favorite.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DepartmentCard from '../components/Department/cardDepartment/carddepartment'
+import { useFonts } from 'expo-font';
 
 export default function FavoritePage() {
     const [favoriteDepartments, setFavoriteDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
     const handleDepartmentCardPress = (department) => {
         navigation.navigate('detailsDepartment', { departmentId: department._id });
     };
@@ -56,7 +65,9 @@ export default function FavoritePage() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}></View>
+            <View style={styles.header}>
+                <Text style={styles.title}>Departamentos favoritos</Text>
+            </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
                 {loading ? (
@@ -98,6 +109,15 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#000000",
         padding: 24,
+    },
+    header: {
+        marginTop: 60,
+        marginBottom: 20,
+    },
+    title: {
+        color: '#FFFFFF',
+        fontSize: 24,
+        fontFamily: 'UbuntuBold',
     },
     scrollContainer: {
         flexGrow: 1,

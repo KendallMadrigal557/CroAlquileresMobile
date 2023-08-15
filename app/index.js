@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Pressable, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';  
 import NavBar from '../components/navbar/navbar';
 import DepartmentSearch from '../components/Department/DepartmentSeacrh/departmentSearch';
 import DepartmentService from '../services/department.service';
 import DepartmentCard from '../components/Department/cardDepartment/carddepartment';
 import PlaceService from '../services/place.service';
 import { Picker } from '@react-native-picker/picker';
-import {ipAPI} from '../config/config';
+import { ipAPI } from '../config/config';
+
 export default function Page() {
+  
+
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredDepartments, setFilteredDepartments] = useState([]);
@@ -21,6 +25,15 @@ export default function Page() {
     canton: '',
     distrito: '',
   });
+  const [fontsLoaded] = useFonts({
+    UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+    UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+    UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+    UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+    UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+    UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+  });
+
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -125,6 +138,10 @@ export default function Page() {
     setFilteredDepartments(departments);
   };
 
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}></View>
@@ -185,7 +202,6 @@ export default function Page() {
           </View>
         </View>
         <TouchableOpacity onPress={handleClearSearch} style={styles.clearButton}>
-          
           <Text style={styles.clearButtonText}>Limpiar busqueda</Text>
         </TouchableOpacity>
 
@@ -248,6 +264,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   inputLabel: {
+    fontFamily: 'UbuntuBold',
     color: '#ffffff',
     marginBottom: 5,
   },
@@ -255,6 +272,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#222222',
     borderRadius: 5,
     padding: 5,
+    fontFamily: 'UbuntuBold',
     color: '#ffffff',
   },
   noDepartmentsText: {
@@ -267,16 +285,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   clearButton: {
+    fontFamily: 'UbuntuBold',
     backgroundColor: '#222222',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 25,
     alignSelf: 'flex-end',
     marginBottom: 10,
   },
   clearButtonText: {
+    fontFamily: 'UbuntuBold',
     color: '#ffffff',
-    fontWeight: 'bold',
     borderRadius: 30,
   },
 });
