@@ -12,6 +12,7 @@ const InsurancePage = () => {
     const [selectedInsurances, setSelectedInsurances] = useState([]);
     const route = useRoute();
     const { departmentPrice } = route.params;
+    const { departmentId } = route.params;
 
     const [fontsLoaded] = useFonts({
         UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
@@ -49,6 +50,7 @@ const InsurancePage = () => {
         navigation.navigate('payment', {
             selectedInsurancePrices: getSelectedInsurancesData().map((insurance) => insurance.price),
             departmentPrice,
+            departmentId: departmentId, 
         });
     };
 
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
         marginTop: 60,
         marginBottom: 20,
     },
-    headerText:{
+    headerText: {
         color: '#FFFFFF',
         fontSize: 24,
         fontFamily: 'UbuntuBold',

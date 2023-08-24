@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import DepartmentService from '../services/department.service';
 import PaymentService  from '../services/payment.service';
 import { useFonts } from 'expo-font';
 
@@ -13,6 +14,7 @@ const PaymentScreen = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const route = useRoute();
     const navigation = useNavigation(); 
+    const { departmentId } = route.params;
     const [fontsLoaded] = useFonts({
         UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
         UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
@@ -23,6 +25,10 @@ const PaymentScreen = () => {
     });
     const { selectedInsurancePrices = [], departmentPrice = 0 } = route?.params || {};
     
+    const handleReviewsPress = () => {
+        navigation.navigate('index');
+    };
+
     const calculateTotalPayment = () => {
         const insurancePricesSum = selectedInsurancePrices.reduce((total, price) => total + price, 0);
         return insurancePricesSum + departmentPrice;
@@ -51,10 +57,15 @@ const PaymentScreen = () => {
     
             if (response && response.cardNumber) {
                 setIsProcessing(true);
-                setTimeout(() => {
+                setTimeout(async () => {
                     setIsProcessing(false);
                     alert('¡Reserva realizada con éxito!');
-                    navigation.navigate('index'); // Replace 'IndexScreen' with the name of your index screen
+                    try {
+                        await DepartmentService.changeOccupiedStatus(departmentId, true);
+                    } catch (error) {
+                        console.error('Error changing occupied status:', error);
+                    }
+                    navigation.navigate('index'); 
                 }, 3000);
             } else {
                 alert('La tarjeta es incorrecta.');
@@ -70,7 +81,7 @@ const PaymentScreen = () => {
         <View style={styles.containerDark}>
             <View style={styles.header}>
                 <Text style={styles.title}>Ingrese los datos de la tarjeta:</Text>
-                <TouchableOpacity onPress={() => alert('Botón de volver presionado')} style={styles.back}>
+                <TouchableOpacity onPress={handleReviewsPress} style={styles.back}>
                     <Text style={{ color: '#FFFFFF', fontSize: 16 ,fontFamily: 'UbuntuBold' }}>Volver</Text>
                 </TouchableOpacity>
             </View>

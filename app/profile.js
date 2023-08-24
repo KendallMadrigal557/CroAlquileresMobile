@@ -3,10 +3,11 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/navbar/navbar';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 
 const ProfileScreen = () => {
-    
+    const navigation = useNavigation();
     const [fontsLoaded] = useFonts({
         UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
         UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
@@ -18,7 +19,7 @@ const ProfileScreen = () => {
 
     const handleLogout = async () => {
         await AsyncStorage.removeItem('user');
-        setShowTwoFactorForm(false);
+        navigation.navigate('index');
     };
     
     const [userData, setUserData] = useState(null);

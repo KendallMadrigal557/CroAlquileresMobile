@@ -25,6 +25,10 @@ export default function Page() {
     canton: '',
     distrito: '',
   });
+  const handleRefresh = () => {
+    setLoading(true); 
+    fetchDepartments(); 
+  };
   const [fontsLoaded] = useFonts({
     UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
     UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
@@ -222,7 +226,7 @@ export default function Page() {
               ]}
             >
               <DepartmentCard
-                image={`http://${ipAPI}:3002/uploads/${department.image}`}
+                image={`http://${ipAPI}:3002/uploads/${department.images[0]}`}
                 price={department.price}
                 name={department.place}
                 provincia={department.provincia}

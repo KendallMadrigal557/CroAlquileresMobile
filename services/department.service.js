@@ -29,9 +29,9 @@ class DepartmentService {
         }
     }
 
-    static async updateDepartment(id, departmentData) {
+    static async changeOccupiedStatus(id, isOccupied) {
         try {
-            const response = await axios.put(`${API_URL}/department/${id}`, departmentData);
+            const response = await axios.put(`${API_URL}/department/${id}`, { isOccupied });
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);

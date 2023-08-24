@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Image, Text, Pressable, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, View, Image, Text, Pressable, ScrollView, Alert, Animated } from 'react-native';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,10 +8,12 @@ import DepartmentService from '../services/department.service';
 import FavoriteService from '../services/favorite.service';
 import { ipAPI } from '../config/config';
 import { useFonts } from 'expo-font';
+import Modal from 'react-native-modal';
 
 const DetailsPage = () => {
     const navigation = useNavigation();
     const route = useRoute();
+    const [showFullDescription, setShowFullDescription] = useState(false);
     const { departmentId } = route.params;
     const [department, setDepartment] = useState(null);
     const [favoriteStatus, setFavoriteStatus] = useState(false);
@@ -75,6 +77,35 @@ const DetailsPage = () => {
         navigation.goBack();
     };
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const imageChangeInterval = 3000;
+    const fadeValue = useRef(new Animated.Value(1)).current;
+    const MAX_DESCRIPTION_LENGTH = 100;
+    useEffect(() => {
+        const imageInterval = setInterval(() => {
+            // Start fade-out animation
+            Animated.timing(fadeValue, {
+                toValue: 0,
+                duration: 500, // Fade-out duration in milliseconds
+                useNativeDriver: false, // Set to true if available on your React Native version
+            }).start(() => {
+                setCurrentImageIndex(prevIndex =>
+                    (prevIndex + 1) % department.images.length
+                );
+
+                // Start fade-in animation after changing image
+                Animated.timing(fadeValue, {
+                    toValue: 1,
+                    duration: 500, // Fade-in duration in milliseconds
+                    useNativeDriver: false, // Set to true if available on your React Native version
+                }).start();
+            });
+        }, imageChangeInterval);
+
+        return () => {
+            clearInterval(imageInterval);
+        };
+    }, [department]);
     const handleInsurancePress = () => {
         if (!loggedIn) {
             Alert.alert('Debe iniciar sesión para realizar una reserva.');
@@ -82,7 +113,7 @@ const DetailsPage = () => {
             return;
         }
 
-        navigation.navigate('insurance', { departmentPrice: department?.price });
+        navigation.navigate('insurance', { departmentPrice: department?.price, departmentId: department._id });
     };
     const handleReviewsPress = () => {
         navigation.navigate('review', { departmentId: department._id });
@@ -141,9 +172,9 @@ const DetailsPage = () => {
             </View>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
                 <View style={styles.priceContainer}>
-                    <Image
-                        source={{ uri: `http://${ipAPI}:3002/uploads/${department.image}` }}
-                        style={styles.image}
+                    <Animated.Image
+                        source={{ uri: `http://${ipAPI}:3002/uploads/${department.images[currentImageIndex]}` }}
+                        style={[styles.image, { opacity: fadeValue }]}
                     />
                     <View style={styles.overlay}>
                         <Text style={styles.price}>{department.price} USD</Text>
@@ -159,17 +190,67 @@ const DetailsPage = () => {
                     </View>
                 </View>
                 <View style={styles.cardContainer}>
-                    <Text style={styles.description}>{department.description}</Text>
+                    <Text style={styles.description}>
+                        {showFullDescription
+                            ? department.description
+                            : department.description.length > MAX_DESCRIPTION_LENGTH
+                                ? department.description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
+                                : department.description}
+                    </Text>
+                    {department.description.length > MAX_DESCRIPTION_LENGTH && !showFullDescription && (
+                        <Text style={styles.verMasLink} onPress={() => setShowFullDescription(true)}>
+                            Ver más
+                        </Text>
+                    )}
+                </View>
+                <Modal isVisible={showFullDescription}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalDescription}>{department.description}</Text>
+                        <Text style={styles.cerrarLink} onPress={() => setShowFullDescription(false)}>
+                            Cerrar
+                        </Text>
+                    </View>
+                </Modal>
+                <View style={styles.availabilityContainer}>
+                    <MaterialIcons
+                        name={department.isOccupied ? 'event-busy' : 'event-available'}
+                        size={24}
+                        color={department.isOccupied ? 'red' : 'green'}
+                    />
+                    <Text style={styles.availabilityText}>
+                        {department.isOccupied ? 'No disponible' : 'Disponible'}
+                    </Text>
+                </View>
+
+                <View style={styles.roomsContainer}>
+                    <View style={styles.iconTextContainer}>
+                        <MaterialIcons name="hotel" size={24} color="white" />
+                        <Text style={styles.roomText}>
+                            Habitaciones: {department.rooms}
+                        </Text>
+                    </View>
+                    <View style={styles.iconTextContainer}>
+                        <MaterialIcons name="group" size={24} color="white" />
+                        <Text style={styles.roomText}>
+                            Capacidad: {department.capacity} personas
+                        </Text>
+                    </View>
                 </View>
                 <Pressable style={styles.reviewsButton} onPress={handleReviewsPress}>
                     <Text style={styles.reviewsButtonText}>Reseñas</Text>
                 </Pressable>
                 <View style={styles.priceButtonContainer}>
-                    <Pressable style={styles.priceButton} onPress={handleInsurancePress} disabled={isProcessing}>
-                        <Text style={styles.priceButtonText}>
-                            {isProcessing ? 'Procesando...' : 'Reservar ahora'}
-                        </Text>
-                    </Pressable>
+                    {!department.isOccupied && (
+                        <Pressable
+                            style={styles.priceButton}
+                            onPress={handleInsurancePress}
+                            disabled={isProcessing}
+                        >
+                            <Text style={styles.priceButtonText}>
+                                {isProcessing ? 'Procesando...' : 'Reservar ahora'}
+                            </Text>
+                        </Pressable>
+                    )}
                 </View>
             </ScrollView>
             <NavBar />
@@ -283,6 +364,60 @@ const styles = StyleSheet.create({
         backgroundColor: "#2f3030",
         padding: 10,
         borderRadius: 5,
+    }, verMasLink: {
+        color: '#FFFFFF',
+        marginTop: 8,
+        textDecorationLine: 'underline',
+        fontFamily: 'UbuntuBold',
+        textAlign: 'center',
+    },
+    modalContainer: {
+        height: '90%',
+        backgroundColor: '#202020',
+        padding: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalDescription: {
+        fontSize: 11,
+        marginBottom: 10,
+        textAlign: 'justify',
+        color: '#FFFFFF',
+    },
+    cerrarLink: {
+        color: '#FFFFFF',
+        textAlign: 'center',
+    },
+    availabilityContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#202020',
+        borderRadius: 25,
+        padding: 16,
+    },
+    availabilityText: {
+        marginLeft: 8,
+        color: 'white',
+        fontFamily: 'UbuntuRegular',
+    },
+    roomsContainer: {
+        marginTop: 16,
+        backgroundColor: '#202020',
+        borderRadius: 25,
+        padding: 16,
+        marginBottom: 16,
+    },
+    iconTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    roomText: {
+        marginLeft: 8,
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'UbuntuRegular',
     },
 });
 

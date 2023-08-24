@@ -1,0 +1,5 @@
+numero de la tarjeta = 4556123456789012
+
+codigo de seguridad = 789
+
+fecha de vencimiento = 12 / 31

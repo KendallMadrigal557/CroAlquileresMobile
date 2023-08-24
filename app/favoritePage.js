@@ -7,7 +7,7 @@ import FavoriteService from '../services/favorite.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DepartmentCard from '../components/Department/cardDepartment/carddepartment'
 import { useFonts } from 'expo-font';
-
+import { ipAPI } from '../config/config';
 export default function FavoritePage() {
     const [favoriteDepartments, setFavoriteDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -87,7 +87,7 @@ export default function FavoritePage() {
                             ]}
                         >
                             <DepartmentCard
-                                image={`http:/192.168.0.2:3002/uploads/${department.image}`}
+                                image={`http://${ipAPI}:3002/uploads/${department.images[0]}`}
                                 price={department.price}
                                 name={department.place}
                                 provincia={department.provincia}
