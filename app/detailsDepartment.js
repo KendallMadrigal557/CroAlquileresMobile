@@ -1,20 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Image, Text, Pressable, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, View, Image, Text, Pressable, ScrollView, Alert, Animated } from 'react-native';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/navbar/navbar';
 import DepartmentService from '../services/department.service';
 import FavoriteService from '../services/favorite.service';
+import { ipAPI } from '../config/config';
+import { useFonts } from 'expo-font';
+import Modal from 'react-native-modal';
 
 const DetailsPage = () => {
     const navigation = useNavigation();
     const route = useRoute();
+    const [showFullDescription, setShowFullDescription] = useState(false);
     const { departmentId } = route.params;
     const [department, setDepartment] = useState(null);
     const [favoriteStatus, setFavoriteStatus] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [userId, setUserId] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
+
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
 
     useEffect(() => {
         const fetchDepartment = async () => {
@@ -30,6 +45,20 @@ const DetailsPage = () => {
     }, [departmentId]);
 
     useEffect(() => {
+        const checkLoginStatus = async () => {
+            const user = await AsyncStorage.getItem('user');
+
+            if (user) {
+                const { _id } = JSON.parse(user);
+                setUserId(_id);
+                setLoggedIn(true);
+            }
+        };
+
+        checkLoginStatus();
+    }, []);
+
+    useEffect(() => {
         const checkIsFavorite = async () => {
             try {
                 const user = await AsyncStorage.getItem('user');
@@ -40,7 +69,7 @@ const DetailsPage = () => {
                 console.log('Error fetching favorite departments:', error);
             }
         };
-    
+
         checkIsFavorite();
     }, [departmentId]);
 
@@ -48,6 +77,44 @@ const DetailsPage = () => {
         navigation.goBack();
     };
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const imageChangeInterval = 3000;
+    const fadeValue = useRef(new Animated.Value(1)).current;
+    const MAX_DESCRIPTION_LENGTH = 100;
+    useEffect(() => {
+        const imageInterval = setInterval(() => {
+            // Start fade-out animation
+            Animated.timing(fadeValue, {
+                toValue: 0,
+                duration: 500, // Fade-out duration in milliseconds
+                useNativeDriver: false, // Set to true if available on your React Native version
+            }).start(() => {
+                setCurrentImageIndex(prevIndex =>
+                    (prevIndex + 1) % department.images.length
+                );
+
+                // Start fade-in animation after changing image
+                Animated.timing(fadeValue, {
+                    toValue: 1,
+                    duration: 500, // Fade-in duration in milliseconds
+                    useNativeDriver: false, // Set to true if available on your React Native version
+                }).start();
+            });
+        }, imageChangeInterval);
+
+        return () => {
+            clearInterval(imageInterval);
+        };
+    }, [department]);
+    const handleInsurancePress = () => {
+        if (!loggedIn) {
+            Alert.alert('Debe iniciar sesión para realizar una reserva.');
+
+            return;
+        }
+
+        navigation.navigate('insurance', { departmentPrice: department?.price, departmentId: department._id });
+    };
     const handleReviewsPress = () => {
         navigation.navigate('review', { departmentId: department._id });
     };
@@ -84,15 +151,6 @@ const DetailsPage = () => {
         }
     };
 
-    const handleReserveNow = () => {
-        setIsProcessing(true);
-
-        setTimeout(() => {
-            setIsProcessing(false);
-            setIsAvailable(false);
-            Alert.alert('Reserva', 'Esta pantalla está en proceso, muchas gracias por usar nuestra app');
-        }, 3000);
-    };
 
     if (!department) {
         return null;
@@ -114,12 +172,12 @@ const DetailsPage = () => {
             </View>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
                 <View style={styles.priceContainer}>
-                    <Image
-                        source={{ uri: `http://192.168.0.2:3002/uploads/${department.image}` }}
-                        style={styles.image}
+                    <Animated.Image
+                        source={{ uri: `http://${ipAPI}:3002/uploads/${department.images[currentImageIndex]}` }}
+                        style={[styles.image, { opacity: fadeValue }]}
                     />
                     <View style={styles.overlay}>
-                        <Text style={styles.price}>{department.price}</Text>
+                        <Text style={styles.price}>{department.price} USD</Text>
                     </View>
                 </View>
                 <View style={styles.detailsContainer}>
@@ -128,21 +186,71 @@ const DetailsPage = () => {
                         <View style={styles.iconContainer}>
                             <MaterialIcons name="location-on" size={16} color="white" style={styles.icon} />
                         </View>
-                        <Text style={styles.location}>{department.location}</Text>
+                        <Text style={styles.location}>{department.provincia + ', ' + department.canton + ', ' + department.distrito}</Text>
                     </View>
                 </View>
                 <View style={styles.cardContainer}>
-                    <Text style={styles.description}>{department.description}</Text>
+                    <Text style={styles.description}>
+                        {showFullDescription
+                            ? department.description
+                            : department.description.length > MAX_DESCRIPTION_LENGTH
+                                ? department.description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
+                                : department.description}
+                    </Text>
+                    {department.description.length > MAX_DESCRIPTION_LENGTH && !showFullDescription && (
+                        <Text style={styles.verMasLink} onPress={() => setShowFullDescription(true)}>
+                            Ver más
+                        </Text>
+                    )}
+                </View>
+                <Modal isVisible={showFullDescription}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalDescription}>{department.description}</Text>
+                        <Text style={styles.cerrarLink} onPress={() => setShowFullDescription(false)}>
+                            Cerrar
+                        </Text>
+                    </View>
+                </Modal>
+                <View style={styles.availabilityContainer}>
+                    <MaterialIcons
+                        name={department.isOccupied ? 'event-busy' : 'event-available'}
+                        size={24}
+                        color={department.isOccupied ? 'red' : 'green'}
+                    />
+                    <Text style={styles.availabilityText}>
+                        {department.isOccupied ? 'No disponible' : 'Disponible'}
+                    </Text>
+                </View>
+
+                <View style={styles.roomsContainer}>
+                    <View style={styles.iconTextContainer}>
+                        <MaterialIcons name="hotel" size={24} color="white" />
+                        <Text style={styles.roomText}>
+                            Habitaciones: {department.rooms}
+                        </Text>
+                    </View>
+                    <View style={styles.iconTextContainer}>
+                        <MaterialIcons name="group" size={24} color="white" />
+                        <Text style={styles.roomText}>
+                            Capacidad: {department.capacity} personas
+                        </Text>
+                    </View>
                 </View>
                 <Pressable style={styles.reviewsButton} onPress={handleReviewsPress}>
                     <Text style={styles.reviewsButtonText}>Reseñas</Text>
                 </Pressable>
                 <View style={styles.priceButtonContainer}>
-                    <Pressable style={styles.priceButton} onPress={handleReserveNow} disabled={isProcessing}>
-                        <Text style={styles.priceButtonText}>
-                            {isProcessing ? 'Procesando...' : 'Reservar ahora'}
-                        </Text>
-                    </Pressable>
+                    {!department.isOccupied && (
+                        <Pressable
+                            style={styles.priceButton}
+                            onPress={handleInsurancePress}
+                            disabled={isProcessing}
+                        >
+                            <Text style={styles.priceButtonText}>
+                                {isProcessing ? 'Procesando...' : 'Reservar ahora'}
+                            </Text>
+                        </Pressable>
+                    )}
                 </View>
             </ScrollView>
             <NavBar />
@@ -189,7 +297,7 @@ const styles = StyleSheet.create({
     price: {
         color: "white",
         fontSize: 24,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold",
     },
     detailsContainer: {
         marginBottom: 16,
@@ -197,7 +305,7 @@ const styles = StyleSheet.create({
     name: {
         color: "white",
         fontSize: 18,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold",
         marginBottom: 8,
     },
     locationContainer: {
@@ -207,6 +315,7 @@ const styles = StyleSheet.create({
     location: {
         color: "#8e9191",
         fontSize: 14,
+        fontFamily: "UbuntuItalic",
         marginLeft: 4,
     },
     cardContainer: {
@@ -217,6 +326,7 @@ const styles = StyleSheet.create({
     },
     description: {
         color: "white",
+        fontFamily: "UbuntuRegular"
     },
     favoriteButton: {
         paddingTop: 10,
@@ -231,27 +341,83 @@ const styles = StyleSheet.create({
     reviewsButtonText: {
         color: "white",
         fontSize: 16,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold"
     },
     priceButtonContainer: {
         alignItems: "center",
+        fontFamily: "UbuntuBold",
         marginBottom: 16,
     },
     priceButton: {
         backgroundColor: "#7066e5",
         borderRadius: 20,
+        fontFamily: "UbuntuBold",
         paddingVertical: 16,
         paddingHorizontal: 32,
     },
     priceButtonText: {
         color: "white",
         fontSize: 16,
-        fontWeight: "bold",
+        fontFamily: "UbuntuBold"
     },
     back: {
         backgroundColor: "#2f3030",
         padding: 10,
         borderRadius: 5,
+    }, verMasLink: {
+        color: '#FFFFFF',
+        marginTop: 8,
+        textDecorationLine: 'underline',
+        fontFamily: 'UbuntuBold',
+        textAlign: 'center',
+    },
+    modalContainer: {
+        height: '90%',
+        backgroundColor: '#202020',
+        padding: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalDescription: {
+        fontSize: 11,
+        marginBottom: 10,
+        textAlign: 'justify',
+        color: '#FFFFFF',
+    },
+    cerrarLink: {
+        color: '#FFFFFF',
+        textAlign: 'center',
+    },
+    availabilityContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#202020',
+        borderRadius: 25,
+        padding: 16,
+    },
+    availabilityText: {
+        marginLeft: 8,
+        color: 'white',
+        fontFamily: 'UbuntuRegular',
+    },
+    roomsContainer: {
+        marginTop: 16,
+        backgroundColor: '#202020',
+        borderRadius: 25,
+        padding: 16,
+        marginBottom: 16,
+    },
+    iconTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    roomText: {
+        marginLeft: 8,
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'UbuntuRegular',
     },
 });
 

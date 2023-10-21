@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
 import NavBar from '../components/navbar/navbar';
 import UserService from '../services/user.service';
+import PlaceService from '../services/place.service';
+import { useFonts } from 'expo-font';
 
 const RegisterPage = () => {
     const navigation = useNavigation();
@@ -12,10 +15,70 @@ const RegisterPage = () => {
         email: '',
         password: '',
         confirmPassword: '',
+        provincia: '',
+        canton: '',
+        distrito: '',
     });
+    const [fontsLoaded] = useFonts({
+        UbuntuBold: require("../assets/Ubuntu-Bold.ttf"),
+        UbuntuBoldItalic: require("../assets/Ubuntu-BoldItalic.ttf"),
+        UbuntuItalic: require("../assets/Ubuntu-Italic.ttf"),
+        UbuntuLight: require("../assets/Ubuntu-Light.ttf"),
+        UbuntuLightItalic: require("../assets/Ubuntu-LightItalic.ttf"),
+        UbuntuRegular: require("../assets/Ubuntu-Regular.ttf"),
+    });
+    const [expiration, setExpiration] = useState(30);
+    const [provincias, setProvincias] = useState([]);
+    const [cantones, setCantones] = useState([]);
+    const [distritos, setDistritos] = useState([]);
+
+    useEffect(() => {
+        loadProvincias();
+    }, []);
+
+    const loadProvincias = async () => {
+        try {
+            const response = await PlaceService.getPlaces();
+            const provinciasData = response.map((provincia) => ({
+                label: provincia.provincia,
+                value: provincia.provincia,
+                cantones: provincia.cantones,
+            }));
+            setProvincias(provinciasData);
+        } catch (error) {
+            console.log('Error loading provincias:', error);
+        }
+    };
+
+    const loadCantones = (selectedProvincia) => {
+        const provincia = provincias.find((provincia) => provincia.value === selectedProvincia);
+        if (provincia) {
+            const cantonesData = provincia.cantones.map((canton) => ({
+                label: canton.nombre,
+                value: canton.nombre,
+                distritos: canton.distritos,
+            }));
+            setCantones(cantonesData);
+            setDistritos([]);
+        }
+    };
+
+    const loadDistritos = (selectedCanton) => {
+        const provincia = provincias.find((provincia) => provincia.value === userData.provincia);
+        if (provincia) {
+            const canton = provincia.cantones.find((canton) => canton.nombre.toLowerCase() === selectedCanton.toLowerCase());
+            if (canton) {
+                const distritosData = canton.distritos.map((distrito) => ({
+                    label: distrito.nombre,
+                    value: distrito.nombre,
+                }));
+                setDistritos(distritosData);
+            }
+        }
+    };
 
     const handleChangeText = (key, value) => {
-        setUserData(prevState => ({ ...prevState, [key]: value }));
+        setUserData((prevState) => ({ ...prevState, [key]: value }));
     };
 
     const goToLogin = () => {
@@ -25,42 +88,35 @@ const RegisterPage = () => {
     const handleRegister = async () => {
         try {
             const { confirmPassword, ...userDataWithoutConfirm } = userData;
-            const response = await UserService.createUser(userDataWithoutConfirm);
+            const response = await UserService.createUser({
+                name: userDataWithoutConfirm.name,
+                email: userDataWithoutConfirm.email,
+                password: userDataWithoutConfirm.password,
+                passwordDuration: expiration,
+                provincia: userDataWithoutConfirm.provincia,
+                canton: userDataWithoutConfirm.canton,
+                distrito: userDataWithoutConfirm.distrito,
+            });
 
-            Alert.alert(
-                'Registro exitoso',
-                'Por favor, inicia sesión.',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => navigation.navigate('login'),
-                    },
-                ]
-            );
+            Alert.alert('Registro exitoso', 'Por favor, inicia sesión.', [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.navigate('login'),
+                },
+            ]);
         } catch (error) {
             console.log('Error registering user:', error);
             if (error.response && error.response.data && error.response.data.message) {
-                console.log(error.response.data.message);
+                Alert.alert('Error', error.response.data.message);
             } else {
-                Alert.alert(
-                    'Error al registrar',
-                    'Error al registrar el usuario.',
-                    [
-                        {
-                            text: 'OK',
-                        },
-                    ]
-                );
+                Alert.alert('Error', error.message);
             }
         }
     };
 
     return (
         <View style={styles.container}>
-            <ScrollView
-                contentContainerStyle={styles.scrollContainer}
-                showsVerticalScrollIndicator={false}
-            >
+            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
                 <View style={styles.header}>
                     <Pressable onPress={goToLogin} style={styles.back}>
                         <Entypo name="chevron-left" size={24} color="white" />
@@ -77,27 +133,27 @@ const RegisterPage = () => {
                         <Text style={styles.inputLabel}>Nombre</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder='Nombre'
+                            placeholder="Nombre"
                             placeholderTextColor="#AAAAAA"
-                            onChangeText={text => handleChangeText('name', text)}
+                            onChangeText={(text) => handleChangeText('name', text)}
                         />
                     </View>
                     <View style={styles.inputContainer}>
                         <Text style={styles.inputLabel}>Email</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder='correo@example.com'
+                            placeholder="correo@example.com"
                             placeholderTextColor="#AAAAAA"
-                            onChangeText={text => handleChangeText('email', text)}
+                            onChangeText={(text) => handleChangeText('email', text)}
                         />
                     </View>
                     <View style={styles.inputContainer}>
                         <Text style={styles.inputLabel}>Contraseña</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder='Contraseña'
+                            placeholder="Contraseña"
                             placeholderTextColor="#AAAAAA"
-                            onChangeText={text => handleChangeText('password', text)}
+                            onChangeText={(text) => handleChangeText('password', text)}
                             secureTextEntry
                         />
                     </View>
@@ -105,11 +161,62 @@ const RegisterPage = () => {
                         <Text style={styles.inputLabel}>Confirmar Contraseña</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder='Confirmar contraseña'
+                            placeholder="Confirmar contraseña"
                             placeholderTextColor="#AAAAAA"
-                            onChangeText={text => handleChangeText('confirmPassword', text)}
+                            onChangeText={(text) => handleChangeText('confirmPassword', text)}
                             secureTextEntry
                         />
+                    </View>
+                    <View style={styles.centerPickerContainer}>
+                        <Text style={styles.inputLabel}>Expiración de Contraseña</Text>
+                        <Picker
+                            selectedValue={expiration}
+                            style={styles.picker}
+                            onValueChange={(itemValue) => setExpiration(itemValue)}
+                        >
+                            <Picker.Item label="30 días" value={30} />
+                            <Picker.Item label="60 días" value={60} />
+                            <Picker.Item label="90 días" value={90} />
+                        </Picker>
+                        <Text style={styles.inputLabel}>Provincia</Text>
+                        <Picker
+                            selectedValue={userData.provincia}
+                            style={styles.picker}
+                            onValueChange={(value) => {
+                                handleChangeText('provincia', value);
+                                loadCantones(value);
+                            }}
+                        >
+                            <Picker.Item label="Seleccionar provincia" value="" />
+                            {provincias.map((provincia) => (
+                                <Picker.Item key={provincia.value} label={provincia.label} value={provincia.value} />
+                            ))}
+                        </Picker>
+                        <Text style={styles.inputLabel}>Cantón</Text>
+                        <Picker
+                            selectedValue={userData.canton}
+                            style={styles.picker}
+                            onValueChange={(value) => {
+                                handleChangeText('canton', value);
+                                loadDistritos(value);
+                            }}
+                        >
+                            <Picker.Item label="Seleccionar cantón" value="" />
+                            {cantones.map((canton) => (
+                                <Picker.Item key={canton.value} label={canton.label} value={canton.value} />
+                            ))}
+                        </Picker>
+                        <Text style={styles.inputLabel}>Distrito</Text>
+                        <Picker
+                            selectedValue={userData.distrito}
+                            style={styles.picker}
+                            onValueChange={(value) => handleChangeText('distrito', value)}
+                        >
+                            <Picker.Item label="Seleccionar distrito" value="" />
+                            {distritos.map((distrito) => (
+                                <Picker.Item key={distrito.value} label={distrito.label} value={distrito.value} />
+                            ))}
+                        </Picker>
                     </View>
                     <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
                         <Text style={styles.registerButtonText}>Registrarse</Text>
@@ -158,7 +265,7 @@ const styles = StyleSheet.create({
     title: {
         color: '#FFFFFF',
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     inputContainer: {
         width: '100%',
@@ -171,6 +278,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         marginBottom: 8,
         fontSize: 18,
+        fontFamily: 'UbuntuBold',
     },
     input: {
         borderWidth: 1,
@@ -178,7 +286,8 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         color: '#FFFFFF',
         padding: 15,
-        backgroundColor: "#1e1e1e",
+        fontFamily: 'UbuntuItalic',
+        backgroundColor: '#1e1e1e',
         marginRight: 8,
         fontSize: 16,
     },
@@ -193,17 +302,33 @@ const styles = StyleSheet.create({
     registerButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     orContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
     },
+    centerPickerContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    picker: {
+        width: '80%',
+        marginTop: 8,
+        marginBottom: 18,
+        backgroundColor: '#222222',
+        borderColor: '#CCCCCC',
+        borderRadius: 5,
+        padding: 5,
+        color: '#FFFFFF',
+        fontFamily: 'UbuntuBold',
+    },
     orText: {
         color: '#FFFFFF',
         fontSize: 16,
         marginHorizontal: 8,
+        fontFamily: 'UbuntuBold',
     },
     loginContainer: {
         flexDirection: 'row',
@@ -213,11 +338,12 @@ const styles = StyleSheet.create({
         color: '#AAAAAA',
         fontSize: 16,
         marginRight: 8,
+        fontFamily: 'UbuntuRegular',
     },
     loginButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'UbuntuBold',
     },
     back: {
         position: 'absolute',

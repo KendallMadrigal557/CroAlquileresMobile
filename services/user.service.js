@@ -1,5 +1,5 @@
 import axios from 'axios';
-import API_URL from '../config/config';
+import {API_URL} from '../config/config';
 
 class UserService {
     static async createUser(userData) {
@@ -46,6 +46,51 @@ class UserService {
             throw new Error(error.response.data.message);
         }
     }
+
+    static async enableTwoFactor(id, email) {
+        try {
+            const response = await axios.post(`${API_URL}/user/${id}/enable-two-factor`, { email });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async loginUser(email, password) {
+        try {
+            const response = await axios.post(`${API_URL}/login`, { email, password });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async sendUnlockAccountEmail(email, unlockCode) {
+        try {
+            const response = await axios.post(`${API_URL}/send-unlock-email`, { email, unlockCode });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+    static async sendVerificationCode(email) {
+        try {
+            const response = await axios.post(`${API_URL}/send-verification-code`, { email });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+    
+    static async changePassword(email, password, verificationCode) {
+        try {
+            const response = await axios.post(`${API_URL}/change-password`, { email, password, verificationCode });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+    
 }
 
 export default UserService;

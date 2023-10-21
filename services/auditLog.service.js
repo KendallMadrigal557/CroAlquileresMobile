@@ -1,44 +1,46 @@
 import axios from 'axios';
 import {API_URL} from '../config/config';
 
-class FavoriteService {
-    static async createFavorite(favoriteData) {
+class AuditLogService {
+    static async createAuditLog(auditLogData) {
         try {
-            const response = await axios.post(`${API_URL}/favorite`, favoriteData);
+            const response = await axios.post(`${API_URL}/audit-log`, auditLogData);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
         }
     }
 
-    static async getFavorites() {
+    static async getAuditLogs() {
         try {
-            const response = await axios.get(`${API_URL}/favorite`);
-            return response.data;
-        } catch (error) {
-            throw new Error(error.response.data.message);
-        }
-    }
-    static async getFavoritesByUserId(userId) {
-        try {
-            const response = await axios.get(`${API_URL}/favorite?userid=${userId}`);
-            return response.data;
-        } catch (error) {
-            throw new Error(error.response.data.message);
-        }
-    }
-    static async getFavoriteById(id) {
-        try {
-            const response = await axios.get(`${API_URL}/favorite/${id}`);
+            const response = await axios.get(`${API_URL}/audit-log`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
         }
     }
 
-    static async deleteFavorite(id) {
+    static async getAuditLogById(id) {
         try {
-            const response = await axios.delete(`${API_URL}/favorite/${id}`);
+            const response = await axios.get(`${API_URL}/audit-log/${id}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async updateAuditLog(id, auditLogData) {
+        try {
+            const response = await axios.put(`${API_URL}/audit-log/${id}`, auditLogData);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async deleteAuditLog(id) {
+        try {
+            const response = await axios.delete(`${API_URL}/audit-log/${id}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
@@ -46,4 +48,4 @@ class FavoriteService {
     }
 }
 
-export default FavoriteService;
+export default AuditLogService;

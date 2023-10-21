@@ -1,44 +1,46 @@
 import axios from 'axios';
-import {API_URL} from '../config/config';
+import {API_MUNI} from '../config/config';
 
-class FavoriteService {
-    static async createFavorite(favoriteData) {
+class PlaceService {
+    static async createPlace(placeData) {
         try {
-            const response = await axios.post(`${API_URL}/favorite`, favoriteData);
-            return response.data;
-        } catch (error) {
-            throw new Error(error.response.data.message);
-        }
-    }
-
-    static async getFavorites() {
-        try {
-            const response = await axios.get(`${API_URL}/favorite`);
-            return response.data;
-        } catch (error) {
-            throw new Error(error.response.data.message);
-        }
-    }
-    static async getFavoritesByUserId(userId) {
-        try {
-            const response = await axios.get(`${API_URL}/favorite?userid=${userId}`);
-            return response.data;
-        } catch (error) {
-            throw new Error(error.response.data.message);
-        }
-    }
-    static async getFavoriteById(id) {
-        try {
-            const response = await axios.get(`${API_URL}/favorite/${id}`);
+            const response = await axios.post(`${API_MUNI}/place`, placeData);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
         }
     }
 
-    static async deleteFavorite(id) {
+    static async getPlaces() {
         try {
-            const response = await axios.delete(`${API_URL}/favorite/${id}`);
+            const response = await axios.get(`${API_MUNI}/place`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async getPlaceById(id) {
+        try {
+            const response = await axios.get(`${API_MUNI}/place/${id}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async updatePlace(id, placeData) {
+        try {
+            const response = await axios.put(`${API_MUNI}/place/${id}`, placeData);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.data.message);
+        }
+    }
+
+    static async deletePlace(id) {
+        try {
+            const response = await axios.delete(`${API_MUNI}/place/${id}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response.data.message);
@@ -46,4 +48,4 @@ class FavoriteService {
     }
 }
 
-export default FavoriteService;
+export default PlaceService;

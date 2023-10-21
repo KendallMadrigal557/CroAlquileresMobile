@@ -27,12 +27,10 @@ const styles = StyleSheet.create({
     price: {
         color: "white",
         fontSize: 16,
-        fontWeight: "bold",
     },
     name: {
         color: "white",
         fontSize: 18,
-        fontWeight: "bold",
         marginTop: 12,
     },
     locationContainer: {
